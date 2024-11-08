@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "server-poc"
+version = "0.1.0"
+description = ""
+authors = ["Amir A. Zohrenejad <aazo11@gmail.com>"]
+readme = "README.md"
+packages = [{include = "server_poc"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.115.0"
+uvicorn = "^0.30.6"
+relta = { path = "../relta", develop = true }
+sqlglot = "^25.22.0"
+python-multipart = "^0.0.12"
+aiofiles = "^24.1.0"
+tomli = "^2.0.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
