@@ -1,0 +1,42 @@
+{
+  "name": "repository_stars",
+  "description": "Metrics related to the stargazers of a repository, including the count of stars and details about the first and last stars given.",
+  "datasource": "github_stargazers",
+  "dimensions": [
+    {
+      "name": "starred_at",
+      "description": "The timestamp when the star was given.",
+      "categories": null,
+      "dtype": "TIMESTAMP WITH TIME ZONE"
+    },
+    {
+      "name": "user_login",
+      "description": "The login of the user who starred the repository.",
+      "categories": null,
+      "dtype": "VARCHAR"
+    }
+  ],
+  "measures": [
+    {
+      "name": "total_stars",
+      "description": "The total number of stars the repository has received.",
+      "expr": "COUNT(user_login)"
+    },
+    {
+      "name": "first_star_time",
+      "description": "The timestamp when the first star was given to the repository.",
+      "expr": "MIN(starred_at)"
+    },
+    {
+      "name": "last_star_time",
+      "description": "The timestamp when the last star was given to the repository.",
+      "expr": "MAX(starred_at)"
+    }
+  ],
+  "sample_questions": [
+    "How many stars does the repo have?",
+    "When was the first star given?",
+    "When was the last star given?"
+  ],
+  "sql_to_underlying_datasource": "SELECT starred_at, user__login AS user_login FROM assistant_ui_stargazers_20241108111329.stargazers"
+}
