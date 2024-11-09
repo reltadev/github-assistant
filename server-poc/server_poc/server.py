@@ -6,9 +6,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Annotated
 import aiofiles
+from data_pipelines.github_pipeline import (
+    load_repo_reactions_issues_only,
+    load_repo_events,
+    load_repo_all_data,
+    load_repo_stargazers
+)
 
 
-SOURCE_NAME = "data"
+SOURCE_NAME = "github_issues"
 
 
 class Prompt(BaseModel):
@@ -19,6 +25,12 @@ class Prompt(BaseModel):
 class Feedback(BaseModel):
     type: str
     message: dict
+
+
+class GithubRepo(BaseModel):
+    owner: str
+    repo: str
+    access_token: str | None = None  # Make token optional with default None
 
 
 load_dotenv()
@@ -33,9 +45,7 @@ app.add_middleware(
 )
 
 client = Client()
-source = client.get_or_create_datasource(
-    connection_uri="data/data.csv", name=SOURCE_NAME
-)
+source = client.get_datasource(SOURCE_NAME)
 source.deploy()
 chat = client.create_chat(source)
 
@@ -58,8 +68,8 @@ def create_chat():
 def add_prompt_to_chat(prompt: Prompt):
     global chat
     try:
-        # source = client.get_datasource(SOURCE_NAME)
-        # chat = client.create_chat(source)
+        source = client.get_datasource(SOURCE_NAME)
+        chat = client.create_chat(source)
         response = chat.prompt(prompt.prompt, debug=True)
         print(response)
     except Exception as e:
@@ -106,7 +116,7 @@ async def root():
     return {"message": "hello"}
 
 
-@app.post("/uploadfile/")
+"""@app.post("/uploadfile/")
 async def create_upload_file(
     file: Annotated[UploadFile, File(description="The CSV file that will be queried")],
 ):
@@ -128,4 +138,24 @@ async def create_upload_file(
         "message": {
             "content": f"The file {file.filename} was succesfully uploaded to server-poc/data/data.csv"
         }
-    }
+    }"""
+
+
+@app.post("/load-github-data")
+async def load_github_data(repo_info: GithubRepo):
+    try:
+        # Pass the access token to all pipeline functions
+        load_repo_reactions_issues_only(repo_info.owner, repo_info.repo, repo_info.access_token)
+        load_repo_events(repo_info.owner, repo_info.repo, repo_info.access_token)
+        load_repo_all_data(repo_info.owner, repo_info.repo, repo_info.access_token)
+        load_repo_stargazers(repo_info.owner, repo_info.repo, repo_info.access_token)
+        
+        return {
+            "status": "success",
+            "message": f"Successfully loaded data for {repo_info.owner}/{repo_info.repo}"
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to load GitHub data: {str(e)}"
+        )

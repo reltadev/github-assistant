@@ -1,0 +1,28 @@
+engine_version: 1
+sources:
+  github:
+    is_dirty: false
+    last_commit_sha: 3d2993a685e8c1d713a2283ac4025ca3903ed392
+    last_commit_timestamp: '2024-10-28T11:27:37+01:00'
+    files:
+      github/__init__.py:
+        commit_sha: 3d2993a685e8c1d713a2283ac4025ca3903ed392
+        git_sha: 4a1834528bda5e01c7001f547e102028772d6c79
+        sha3_256: 5cf3a4f7ed2a0f3501d36a9918c784d9fb97dd91d026e86d439ac0eb3590b7bb
+      github/README.md:
+        commit_sha: 3d2993a685e8c1d713a2283ac4025ca3903ed392
+        git_sha: 40ebf50d8df6112211c1e46f04f461b33ea80d76
+        sha3_256: be5c81a31373f3c0be66dde44473502b34e43855663d1a6377ea39cf75252c2d
+      github/settings.py:
+        commit_sha: 3d2993a685e8c1d713a2283ac4025ca3903ed392
+        git_sha: 96a18a0d60eaea6884cc3fbdfdd2d308993e4814
+        sha3_256: 468244c5a32f6893623effc110273c920ed8cadb5f2e47071f15ad48e9512d3b
+      github/queries.py:
+        commit_sha: 3d2993a685e8c1d713a2283ac4025ca3903ed392
+        git_sha: 4ebd31f35df3eabae127c1645f0af6811fa6b82e
+        sha3_256: 210fb7c1d4ad57aa3bb674b0eb3912a0f1399909a9c18fcb20a43a615189ba80
+      github/helpers.py:
+        commit_sha: 3d2993a685e8c1d713a2283ac4025ca3903ed392
+        git_sha: 943c2c1aba80eae9dea35215b993ad779925556f
+        sha3_256: 4ba2da3313e33aced3ee82fc3051af92736d9b83e2e5b6af706b5e20714d19c5
+    dlt_version_constraint: '>=0.5.1'
