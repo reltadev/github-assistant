@@ -14,7 +14,7 @@ from data_pipelines.github_pipeline import (
 )
 
 
-SOURCE_NAME = "github_issues"
+SOURCE_NAME = "issues"
 
 
 class Prompt(BaseModel):

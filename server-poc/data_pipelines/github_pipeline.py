@@ -11,10 +11,9 @@ def load_repo_reactions_issues_only(owner: str, repo: str, access_token: str | N
         access_token: Optional GitHub access token
     """
     pipeline = dlt.pipeline(
-        "github_reactions",
+        "github_issues",
         destination=dlt.destinations.duckdb("data/github_issues.duckdb"),
-        dataset_name=f"{repo}_issues",
-        dev_mode=True,
+        dataset_name=f"{repo}_issues"
     )
     data = github_reactions(
         owner, repo, items_per_page=100, max_items=100, access_token=access_token
@@ -48,8 +47,7 @@ def load_repo_all_data(owner: str, repo: str, access_token: str | None = None) -
     pipeline = dlt.pipeline(
         "github_reactions",
         destination=dlt.destinations.duckdb("data/github_reactions.duckdb"),
-        dataset_name=f"{repo}_reactions",
-        dev_mode=True,
+        dataset_name=f"{repo}_reactions"
     )
     data = github_reactions(owner, repo, access_token=access_token)
     print(pipeline.run(data))
@@ -66,8 +64,7 @@ def load_repo_stargazers(owner: str, repo: str, access_token: str | None = None)
     pipeline = dlt.pipeline(
         "github_stargazers",
         destination=dlt.destinations.duckdb("data/github_stargazers.duckdb"),
-        dataset_name=f"{repo}_stargazers",
-        dev_mode=True,
+        dataset_name=f"{repo}_stargazers"
     )
     data = github_stargazers(owner, repo, access_token=access_token)
     print(pipeline.run(data))
