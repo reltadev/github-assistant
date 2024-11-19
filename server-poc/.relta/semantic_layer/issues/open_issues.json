@@ -1,0 +1,24 @@
+{
+  "name": "open_issues",
+  "description": "This metric provides the number of currently open issues in the GitHub repository.",
+  "datasource": "issues",
+  "dimensions": [
+    {
+      "name": "state",
+      "description": "The current state of the issue, such as open or closed.",
+      "categories": ["OPEN", "CLOSED"],
+      "dtype": "VARCHAR"
+    }
+  ],
+  "measures": [
+    {
+      "name": "open_issue_count",
+      "description": "The count of issues that are currently open.",
+      "expr": "COUNT(CASE WHEN state = 'OPEN' THEN 1 END)"
+    }
+  ],
+  "sample_questions": [
+    "How many issues are currently open?"
+  ],
+  "sql_to_underlying_datasource": "SELECT state FROM assistant_ui_issues.issues"
+}

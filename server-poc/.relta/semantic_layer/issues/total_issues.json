@@ -1,0 +1,24 @@
+{
+  "name": "total_issues",
+  "description": "This metric provides the total number of issues in the GitHub repository.",
+  "datasource": "issues",
+  "dimensions": [
+    {
+      "name": "number",
+      "description": "The unique identifier for each issue.",
+      "categories": null,
+      "dtype": "BIGINT"
+    }
+  ],
+  "measures": [
+    {
+      "name": "issue_count",
+      "description": "The total count of issues in the repository.",
+      "expr": "COUNT(number)"
+    }
+  ],
+  "sample_questions": [
+    "How many issues does the repo have?"
+  ],
+  "sql_to_underlying_datasource": "SELECT number FROM assistant_ui_issues.issues"
+}

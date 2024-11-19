@@ -28,8 +28,7 @@ cp client-poc/.env.example client-poc/.env && cp server-poc/.env.example server-
 
 4. Set the following environment variables in `server-poc/.env`:
     - `OPENAI_API_KEY`: Your OpenAI API key
-    - Optional `GITHUB_TOKEN`: if you want to test the PR flow, a GitHub personal access token with read/write access to the repository.
-        - Feedback will still work without this environment variable, but it will not be a PR.
+    - `GITHUB_TOKEN`, `GITHUB_USER`, `GITHUB_REPO`: This will be used to copy data from the github repo which questions will be answered from. The GITHUB_USER is the org that owns the repo. 
 
 5. Launch Relta
 
@@ -47,9 +46,8 @@ Then go to http://localhost:3000/ to access the frontend, and optionally http://
 
 ### Caveats
 
-- You must begin the chat by uploading a file and submitting the message just containing the file upload.
-- Uploading a new file removes the chat history of the previous chat, despite it being shown on the frontend.
-- When restarting the server, the chat history will be empty.
+- The first time when data gets loaded can take a few minutes. On subsequent restarts if a local copy of the GitHub data is found then the user is prompted on whether they want to refresh.
+- Currently only GitHub issues data is connected, even though we are copying all the data in the initial data pipeline run.
 
 ## Updating
 
