@@ -52,27 +52,31 @@ def initialize_server(force_refresh: bool = False):
 
     # Initialize Relta client
     server_state.client = Client()
+
+    owner=os.environ.get('GITHUB_USER')
+    repo=os.environ.get('GITHUB_REPO')
+    access_token=os.environ.get('GITHUB_TOKEN')
     
     # Check if data exists
-    data_exists = os.path.exists('data/github_issues.duckdb')
+    data_exists = os.path.exists(f'data/{repo}_github_data.duckdb')
     
     if data_exists and not force_refresh:
         print("Found existing GitHub data. Loading from existing database...")
         server_state.source = server_state.client.get_or_create_datasource(
-            connection_uri='data/github_issues.duckdb', 
-            name='issues'
+            connection_uri=f'data/{repo}_github_data.duckdb', 
+            name='github_data'
         )
     else:
         print("Loading fresh GitHub data...")
         server_state.repo = GithubRepoInfo(
-            owner=os.environ.get('GITHUB_USER'),
-            repo=os.environ.get('GITHUB_REPO'),
-            access_token=os.environ.get('GITHUB_TOKEN')
+            owner=owner,
+            repo=repo,
+            access_token=access_token
         )
         load_data(server_state.repo)
         server_state.source = server_state.client.get_or_create_datasource(
-            connection_uri='data/github_issues.duckdb',
-            name='issues'
+            connection_uri=f'data/{repo}_github_data.duckdb',
+            name='github_data'
         )
 
     server_state.source.deploy()
