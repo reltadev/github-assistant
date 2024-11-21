@@ -12,13 +12,13 @@ def load_repo_reactions_issues_only(owner: str, repo: str, access_token: str | N
     """
     pipeline = dlt.pipeline(
         "github_issues",
-        destination=dlt.destinations.duckdb("data/github_issues.duckdb"),
-        dataset_name=f"{repo}_issues"
+        destination=dlt.destinations.duckdb(f"data/{repo}_github_data.duckdb"),
+        dataset_name="issues"
     )
     data = github_reactions(
         owner, repo, items_per_page=100, max_items=100, access_token=access_token
     ).with_resources("issues")
-    print(pipeline.run(data))
+    print(pipeline.run(data, refresh="drop_sources"))
 
 
 def load_repo_events(owner: str, repo: str, access_token: str | None = None) -> None:
@@ -30,10 +30,10 @@ def load_repo_events(owner: str, repo: str, access_token: str | None = None) -> 
         access_token: Optional GitHub access token
     """
     pipeline = dlt.pipeline(
-        "github_events", destination=dlt.destinations.duckdb("data/github_events.duckdb"), dataset_name=f"{repo}_events"
+        "github_events", destination=dlt.destinations.duckdb(f"data/{repo}_github_data.duckdb"), dataset_name="events"
     )
     data = github_repo_events(owner, repo, access_token=access_token)
-    print(pipeline.run(data))
+    print(pipeline.run(data, refresh="drop_sources"))
 
 
 def load_repo_all_data(owner: str, repo: str, access_token: str | None = None) -> None:
@@ -46,11 +46,11 @@ def load_repo_all_data(owner: str, repo: str, access_token: str | None = None) -
     """
     pipeline = dlt.pipeline(
         "github_reactions",
-        destination=dlt.destinations.duckdb("data/github_reactions.duckdb"),
-        dataset_name=f"{repo}_reactions"
+        destination=dlt.destinations.duckdb(f"data/{repo}_github_data.duckdb"),
+        dataset_name="reactions"
     )
     data = github_reactions(owner, repo, access_token=access_token)
-    print(pipeline.run(data))
+    print(pipeline.run(data, refresh="drop_sources"))
 
 
 def load_repo_stargazers(owner: str, repo: str, access_token: str | None = None) -> None:
@@ -63,11 +63,11 @@ def load_repo_stargazers(owner: str, repo: str, access_token: str | None = None)
     """
     pipeline = dlt.pipeline(
         "github_stargazers",
-        destination=dlt.destinations.duckdb("data/github_stargazers.duckdb"),
-        dataset_name=f"{repo}_stargazers"
+        destination=dlt.destinations.duckdb(f"data/{repo}_github_data.duckdb"),
+        dataset_name="stargazers"
     )
     data = github_stargazers(owner, repo, access_token=access_token)
-    print(pipeline.run(data))
+    print(pipeline.run(data, refresh="drop_sources"))
 
 
 if __name__ == "__main__":
