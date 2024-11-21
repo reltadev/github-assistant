@@ -9,13 +9,19 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^0.0.60",
-    "@assistant-ui/react": "^0.5",
-    "@assistant-ui/react-markdown": "^0.2",
-    "@next/env": "^14.2.14",
-    "next": "14.2.11",
+    "@ai-sdk/openai": "^1.0.2",
+    "@assistant-ui/react": "^0.7",
+    "@assistant-ui/react-markdown": "^0.7",
+    "@next/env": "^15.0.3",
+    "ai": "^4.0.2",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.460.0",
+    "next": "15.0.3",
     "react": "^18",
     "react-dom": "^18",
+    "recharts": "^2.13.3",
+    "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.23.8"
   },
@@ -23,10 +29,11 @@
     "@types/node": "^22",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.11",
+    "eslint": "^9",
+    "eslint-config-next": "15.0.3",
     "postcss": "^8",
-    "tailwindcss": "^3.4.11",
+    "tailwindcss": "^3.4.15",
     "typescript": "^5"
-  }
+  },
+  "packageManager": "pnpm@9.13.2+sha512.88c9c3864450350e65a33587ab801acf946d7c814ed1134da4a924f6df5a2120fd36b46aab68f7cd1d413149112d53c7db3a4136624cfd00ff1846a0c6cef48a"
 }
