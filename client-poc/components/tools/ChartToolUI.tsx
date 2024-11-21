@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/chart";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
-const getColumns = (data: any[]) => {
+const getColumns = (data: object[]) => {
   const [xAxis, ...yAxis] = data.reduce<string[]>((acc, row) => {
     Object.keys(row).forEach((key) => {
       if (!acc.includes(key)) {
@@ -41,7 +41,7 @@ const getColumns = (data: any[]) => {
 };
 
 type ChartConfig = {
-  rows: any[];
+  rows: object[];
   type: "area" | "bar" | "line";
 };
 
@@ -149,7 +149,7 @@ const MyChart: FC<{ config: ChartConfig }> = ({ config }) => {
 };
 
 export const ChartToolUI = makeAssistantToolUI<
-  {},
+  Record<string, never>,
   {
     type: "area" | "bar" | "line";
     rows: object[];
