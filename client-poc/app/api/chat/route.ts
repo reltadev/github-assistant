@@ -32,7 +32,13 @@ If a question is best answered by displaying a graph/chart, use the "chart" tool
 If a question is about a single data point (e.g. "who made the most recent commit?"), use the "text" tool.`;
 
 export const POST = async (request: Request) => {
-  const { repoName, ...requestData } = await request.json();
+  const { repoId, ...requestData } = await request.json();
+
+  const getRepoNameFromId = (id: string) => {
+    const [org, repo] = id.split("&");
+    return `${org}/${repo}`;
+  };
+  const repoName = getRepoNameFromId(repoId);
 
   return getEdgeRuntimeResponse({
     options: {

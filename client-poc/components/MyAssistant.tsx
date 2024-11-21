@@ -7,9 +7,16 @@ import { ChartToolUI } from "./tools/ChartToolUI";
 
 const MarkdownText = makeMarkdownText();
 
-export function MyAssistant() {
+type MyAssistantProps = {
+  repoId: string;
+};
+
+export function MyAssistant({ repoId }: MyAssistantProps) {
   const runtime = useEdgeRuntime({
     api: "/api/chat",
+    body: {
+      repoId,
+    },
     adapters: {
       feedback: {
         submit: async ({ type, message }) => {
