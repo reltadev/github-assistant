@@ -18,5 +18,5 @@ export const getTextQuery = async (query: string) => {
 };
 
 export const submitFeedback = async (type: string, message: string) => {
-  // TODO
+  console.log(type, message);
 };

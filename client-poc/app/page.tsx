@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { PlusCircle, PlusIcon } from "lucide-react";
+import { Card, CardHeader } from "@/components/ui/card";
+import { PlusIcon } from "lucide-react";
 import Link from "next/link";
 
 const repositories = [
