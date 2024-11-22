@@ -13,11 +13,13 @@ class GithubRepoInfo(BaseModel):
 
 def load_data(repo_info: GithubRepoInfo):
     try:
+        print('loading github_data')
         # Pass the access token to all pipeline functions
+        load_repo_stargazers(repo_info.owner, repo_info.repo, repo_info.access_token)
         load_repo_reactions_issues_only(repo_info.owner, repo_info.repo, repo_info.access_token)
         load_repo_events(repo_info.owner, repo_info.repo, repo_info.access_token)
-        load_repo_all_data(repo_info.owner, repo_info.repo, repo_info.access_token)
-        load_repo_stargazers(repo_info.owner, repo_info.repo, repo_info.access_token)
+        #load_repo_all_data(repo_info.owner, repo_info.repo, repo_info.access_token)
+        
         
         return {
             "status": "success",
