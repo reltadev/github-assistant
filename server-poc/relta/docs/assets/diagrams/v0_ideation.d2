@@ -1,0 +1,53 @@
+applications: {
+    streamlit
+    # cli
+    testbench
+  }
+  
+  applications -> relta
+  
+  relta: {
+    connections: Connections
+    # ^ is this needed? can we do df?
+    connections: {
+      tooltip: via DuckDB for SQL access, but potentially could use other programmatic access (dataframes, etc)
+      postgres
+      mysql
+      parquet
+      csv
+    }
+  
+    connections -> builder: Prefilled db/table/col descriptions
+  
+    builder: Semantic Layer Constructor
+    # extnl_context -> builder
+    builder -> semstore: SemanticDescription, SemanticLayer, Metric
+  
+    # extnl_context: External Context
+    semstore: Semantic Layer Store
+    semstore.shape: cylinder
+    app_store: Application Logic Store
+    app_store.shape: cylinder
+    client: Client
+  
+    app_store -> learner <-> semstore: improvement to semantic layer (OOS async)
+    learner: Semantic Layer Fine Tuning
+  
+    agent: {
+      answerability
+      query_constructor
+      answerability -> query_constructor
+    }
+    agent.query_constructor -> presentation
+    client <-> agent: stores/provide/manages chat history as context
+    client -> search: invokes
+  
+    app_store <-> client: store/retrieve chats
+    search: Vector Search Engine
+    search: {
+      tooltip: can implement a hybrid graph search of all join paths up to n deep, etc.
+    }
+    semstore -> search
+    search -> agent.answerability
+  }
+  

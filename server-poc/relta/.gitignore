@@ -1,23 +1,11 @@
-**/.relta/
-!**/.relta/semantic_layer
+tests/data/
+tests/notebooks/
+.vscode/settings.json
+.relta
 
-# Terraform files
-**/.terraform/*
-*.tfstate
-*.tfstate.*
-*.tfvars
-*.tfvars.json
-crash.log
-crash.*.log
-*.tfplan
-override.tf
-override.tf.json
-*_override.tf
-*_override.tf.json
-.terraformrc
-terraform.rc
-.terraform.lock.hcl
+**/.DS_Store
 
+# --- Python .gitignore ---
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -1,0 +1,66 @@
+vars: {
+    d2-config: {
+      layout-engine: elk
+      theme-id: 5
+      dark-theme-id: 200
+    }
+  }
+
+direction: right
+
+repo: Your Repository {
+    db <-> layer
+    db: Database Connection {
+        icon: https://icons.terrastruct.com/essentials%2F119-database.svg
+    }
+
+    layer: Semantic Layer {
+        icon: https://icons.terrastruct.com/essentials%2F143-windows.svg
+    }
+
+}
+
+session: User Session {
+    mat_view: Replica {
+        icon: https://duckdb.org/images/logo-dl/DuckDB_Logo-stacked-dark-mode.png
+    }
+
+    agent: SQL Agent {
+        icon: ../img/artificial-intelligence.png
+    }
+
+    user: User {
+        icon: https://icons.terrastruct.com/azure%2FGeneral%20Service%20Icons%2FUser%20Icon.svg
+    }
+    mat_view <-> agent
+    agent <-> user
+}
+
+repo.layer -> session2: {class: unused-connection}
+repo.layer -> session.mat_view
+repo.layer -> session3: {class: unused-connection}
+
+classes: {
+    unused-session: {
+        label: ...
+        style: {
+            opacity: 0.6
+            fill: transparent
+            stroke-width: 0
+            font-size: 38
+        }
+    }
+
+    unused-connection : {
+        style: {
+            opacity: 0.6
+        }
+    }
+}
+
+session2: {
+    class: unused-session
+}
+session3: {
+    class: unused-session
+}

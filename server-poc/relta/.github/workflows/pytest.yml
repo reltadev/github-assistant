@@ -1,0 +1,79 @@
+# See:
+# - https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions
+# - https://jacobian.org/til/github-actions-poetry/
+# - https://github.com/marketplace/actions/install-poetry-action#usage
+# - https://github.com/snok/install-poetry?tab=readme-ov-file#caching-the-poetry-installation
+
+name: Pytest
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      # ---- CHECKOUT ---- #
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        id: setup-python
+        with:
+          python-version: 3.9
+
+      # ---- POETRY  ---- #
+      - name: Load cached Poetry installation
+        id: cached-poetry
+        uses: actions/cache@v4
+        with:
+          path: ~/.local
+          key: poetry-1.5.1-0
+
+      - name: Install and configure Poetry
+        if: steps.cached-poetry.outputs.cache-hit != 'true'
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.5.1
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          virtualenvs-path: .venv
+
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root --only=main,test
+
+      - name: Install project
+        run: poetry install --no-interaction --only=main,test
+
+      # ---- DATA ---- #
+      - name: Load cached Sample Data
+        uses: actions/cache@v4
+        id: cached-sample-data
+        with:
+          path: ${{ vars.SAMPLE_DATA_PATH }}
+          key: data-${{ vars.SAMPLE_DATA_URL }}-0
+
+      - name: Download sample data
+        if: steps.cached-sample-data.outputs.cache-hit != 'true'
+        run: |
+          curl -L ${{ vars.SAMPLE_DATA_URL }} --create-dirs -o ${{ vars.SAMPLE_DATA_PATH }}/data.csv && chmod +x "${_}"
+
+      # ---- TEST ---- #
+      - name: Run tests
+        env:
+          DUCKDB_FILE_PATH: ${{ vars.DUCKDB_FILE_PATH }}
+          SAMPLE_DATA_PATH: ${{ vars.SAMPLE_DATA_PATH }}
+          OPENAI_API_KEY: ${{ secrets.RELTA_ACTIONS_OPENAI_API_KEY }}
+          PG_CONNECTION_URI: ${{ secrets.PG_CONNECTION_URI }}
+          LANGCHAIN_TRACING_V2: true
+          LANGCHAIN_API_KEY: ${{ secrets.RELTA_ACTIONS_LANGCHAIN_API_KEY }}
+          LOGFIRE_TOKEN: ${{secrets.RELTA_ACTION_LOGFIRE}}
+          LANGCHAIN_PROJECT: ci-pytest
+        run: poetry run pytest

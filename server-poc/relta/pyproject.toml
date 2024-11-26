@@ -1,0 +1,78 @@
+[tool.poetry]
+name = "relta"
+version = "0.1.0"
+description = "Relta makes it easy to build natural language interfaces for relational data"
+authors = [
+    "Gaurav Bhatnagar <gaurav@relta.dev>",
+    "Amir Zohrenejad <amir@relta.dev>",
+]
+readme = "README.md"
+packages = [{ include = "relta", from = "src" }]
+
+[tool.poetry.scripts]
+relta = "relta.cli:run"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pydantic = "^2.8.2"
+pydantic-settings = "^2.4.0"
+
+pandas = "^2.2.2"
+duckdb = "^1.1.0"
+duckdb-engine = "^0.13.1"
+
+langchain = "^0.3"
+langchain-openai = "^0.2"
+langchain-community = "^0.3"
+langgraph = "^0.2.4"
+langgraph-checkpoint-sqlite = "^2.0.1"
+
+overrides = "^7.7.0"
+sqlmodel = "^0.0.21"
+sqlglot = "^25.20.1"
+sqlparse = "^0.5.1"
+tabulate = "^0.9.0"
+pygithub = "^2.4.0"
+deprecated = "^1.2.14"
+logfire = "^1.0.1"
+
+typer = "^0.12.5"
+textual = "^0.85.1"
+python-dotenv = "^1.0.1"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.5.6"
+pre-commit = "^3.8.0"
+ipykernel = "^6.29.5"
+tqdm = "^4.66.4"
+pytest = "^8.3.2"
+kaleido = "0.2.1"
+vanna = { extras = ["chromadb", "openai"], version = "^0.6.6" }
+chromadb = "^0.5.5"
+matplotlib = "^3.9.2"
+ipywidgets = "^8.1.5"
+textual-dev = "^1.6.1"
+
+[tool.poetry.group.docs.dependencies]
+mkdocs-material = "^9.5.31"
+mkdocstrings = { extras = ["python"], version = "^0.25.2" }
+termynal = "^0.12.1"
+mkdocs-d2-plugin = "^1.5.0"
+pymdown-extensions = "^10.11.2"
+mkdocs-awesome-pages-plugin = "^2.9.3"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.3.2"
+python-dotenv = "^1.0.1"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+# addopts = "-ra -q"
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py39"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

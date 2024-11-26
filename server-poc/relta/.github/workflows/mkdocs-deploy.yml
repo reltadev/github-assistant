@@ -1,0 +1,73 @@
+# See https://squidfunk.github.io/mkdocs-material/publishing-your-site/
+
+name: mkdocs-deploy
+on:
+  push:
+    branches:
+      - main
+permissions:
+  contents: write
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure Git Credentials
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+      - uses: actions/setup-python@v5
+        id: setup-python
+        with:
+          python-version: 3.9
+      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
+      - uses: actions/cache@v4
+        with:
+          key: mkdocs-material-${{ env.cache_id }}
+          path: .cache
+          restore-keys: |
+            mkdocs-material-
+
+      # ---- D2 ---- #
+      # - name: Load cached D2 installation
+      #   id: cached-d2
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: ~/.d2
+      #     key: d2-${{ runner.os }}-${{ hashFiles('~/.d2') }}-0
+
+      # - name: Install D2
+      #   if: steps.cached-d2.outputs.cache-hit != 'true'
+      #   run: |
+      #     curl -fsSL https://d2lang.com/install.sh | sh -s -- --prefix ~/.d2
+
+      # ---- POETRY  ---- #
+      - name: Load cached Poetry installation
+        id: cached-poetry
+        uses: actions/cache@v4
+        with:
+          path: ~/.local
+          key: poetry-1.5.1-0
+
+      - name: Install and configure Poetry
+        if: steps.cached-poetry.outputs.cache-hit != 'true'
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.5.1
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          virtualenvs-path: .venv
+
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root --only=docs
+
+      - run: |
+          poetry run mkdocs gh-deploy --force

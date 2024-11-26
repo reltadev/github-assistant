@@ -52,3 +52,41 @@ Then go to http://localhost:3000/ to access the frontend, and optionally http://
 ## Updating
 
 We will generally give instructions on how to update Relta or the POC to handle any bugs or new features.
+
+## Deployment to AWS
+
+### Prerequisites
+
+- AWS CLI configured with appropriate credentials
+- Terraform installed
+- Docker installed
+
+### Deployment Steps
+
+1. Create a `terraform.tfvars` file in the `terraform` directory with your variables:
+
+```hcl
+aws_region = "us-west-2"
+openai_api_key = "your-openai-api-key"
+github_token = "your-github-token"
+github_user = "your-github-username"
+github_repo = "your-github-repo"
+```
+
+2. Run the deployment script:
+
+```sh
+chmod +x deploy.sh
+./deploy.sh
+```
+
+3. After deployment, the application will be available at the ALB DNS name output by Terraform.
+
+### Cleanup
+
+To destroy the AWS resources:
+
+```sh
+cd terraform
+terraform destroy -auto-approve
+```
