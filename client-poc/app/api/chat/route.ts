@@ -35,8 +35,7 @@ export const POST = async (request: Request) => {
   const { repoId, ...requestData } = await request.json();
 
   const getRepoNameFromId = (id: string) => {
-    const [org, repo] = id.split("&");
-    return `${org}/${repo}`;
+    return id.replace("%26", "/");
   };
   const repoName = getRepoNameFromId(repoId);
 

@@ -52,8 +52,10 @@ export default function RepoSelection() {
             <Link href={`/repo/${repo.id}`} key={repo.id}>
               <Card className="aspect-[5/3] hover:bg-muted/20 transition-all hover:shadow-md shadow-none">
                 <CardHeader>
-                  <h2 className="text-xl font-semibold mb-1">{repo.name}</h2>
-                  <p className="text-sm text-gray-500">{repo.orgId}</p>
+                  <h2 className="text-xl font-semibold mb-1 truncate">
+                    {repo.name}
+                  </h2>
+                  <p className="text-sm text-gray-500 truncate">{repo.orgId}</p>
                 </CardHeader>
               </Card>
             </Link>
@@ -67,7 +69,7 @@ export default function RepoSelection() {
             <Card className="aspect-[5/3] hover:bg-muted/20 transition-all shadow-none border-dashed border-2">
               <CardHeader className="flex flex-row items-center gap-2">
                 <PlusIcon className="size-4" />
-                <h2 className="leading-0 !mt-0">Import Repository</h2>
+                <h2 className="leading-0 !mt-0 truncate">Import Repository</h2>
               </CardHeader>
             </Card>
           </Link>
