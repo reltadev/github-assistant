@@ -1,6 +1,7 @@
 **/.relta/
 !**/.relta/semantic_layer
 
+
 # Terraform files
 **/.terraform/*
 *.tfstate
@@ -17,6 +18,7 @@ override.tf.json
 .terraformrc
 terraform.rc
 .terraform.lock.hcl
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
