@@ -7,7 +7,7 @@ const repositories = [
     name: "assistant-ui",
     id: "Yonom/assistant-ui",
   },
-  { name: "CrewAI", id: "joaomdmoura/crewAI" },
+  { name: "CrewAI", id: "joaomdmoura/crewai" },
   {
     name: "LangChain",
     id: "langchain-ai/langchain",

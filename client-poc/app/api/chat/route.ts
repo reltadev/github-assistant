@@ -58,7 +58,7 @@ export const POST = async (request: Request) => {
             query: z.string().describe("The query to provide the agent."),
           }),
           execute: async (requestData) => {
-            const text = await getTextQuery(org, repo, requestData.prompt);
+            const text = await getTextQuery(org, repo, requestData.query);
             return text;
           },
         },

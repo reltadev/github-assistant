@@ -26,8 +26,8 @@ export const getTextQuery = async (
       body: JSON.stringify({ prompt }),
     }
   );
-  const { text } = (await response.json()) as { text: string };
-  return text;
+  const result = (await response.json()) as { text?: string; detail?: string };
+  return result.text ?? result.detail ?? result;
 };
 
 export const submitFeedback = async (type: string, message: string) => {
