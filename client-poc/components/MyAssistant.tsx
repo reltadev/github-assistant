@@ -4,19 +4,19 @@ import { useEdgeRuntime } from "@assistant-ui/react";
 import { Thread } from "@assistant-ui/react";
 import { makeMarkdownText } from "@assistant-ui/react-markdown";
 import { ChartToolUI } from "./tools/ChartToolUI";
+import { TextToolUI } from "./tools/TextToolUI";
 
 const MarkdownText = makeMarkdownText();
 
 type MyAssistantProps = {
-  repoId: string;
+  org: string;
+  repo: string;
 };
 
-export function MyAssistant({ repoId }: MyAssistantProps) {
+export function MyAssistant({ org, repo }: MyAssistantProps) {
   const runtime = useEdgeRuntime({
     api: "/api/chat",
-    body: {
-      repoId,
-    },
+    body: { org, repo },
     adapters: {
       feedback: {
         submit: async ({ type, message }) => {
@@ -40,7 +40,7 @@ export function MyAssistant({ repoId }: MyAssistantProps) {
     <Thread
       runtime={runtime}
       assistantMessage={{ components: { Text: MarkdownText } }}
-      tools={[ChartToolUI]}
+      tools={[ChartToolUI, TextToolUI]}
     />
   );
 }

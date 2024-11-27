@@ -3,40 +3,38 @@ import { PlusIcon } from "lucide-react";
 import Link from "next/link";
 
 const repositories = [
-  { name: "CrewAI", orgId: "joaomdmoura/crewAI", id: "joaomdmoura&crewAI" },
+  {
+    name: "assistant-ui",
+    id: "Yonom/assistant-ui",
+  },
+  { name: "CrewAI", id: "joaomdmoura/crewAI" },
   {
     name: "LangChain",
-    orgId: "langchain-ai/langchain",
-    id: "langchain-ai&langchain",
+    id: "langchain-ai/langchain",
   },
   {
     name: "LlamaIndex",
-    orgId: "jerryjliu/llama_index",
-    id: "jerryjliu&llama_index",
+    id: "jerryjliu/llama_index",
   },
   {
     name: "Transformers",
-    orgId: "huggingface/transformers",
-    id: "huggingface&transformers",
+    id: "huggingface/transformers",
   },
-  { name: "Whisper", orgId: "openai/whisper", id: "openai&whisper" },
-  { name: "GPT-3", orgId: "openai/gpt-3", id: "openai&gpt-3" },
-  { name: "DALL-E", orgId: "openai/DALL-E", id: "openai&DALL-E" },
+  { name: "Whisper", id: "openai/whisper" },
+  { name: "GPT-3", id: "openai/gpt-3" },
+  { name: "DALL-E", id: "openai/DALL-E" },
   {
     name: "Stable Diffusion",
-    orgId: "CompVis/stable-diffusion",
-    id: "CompVis&stable-diffusion",
+    id: "CompVis/stable-diffusion",
   },
   {
     name: "Anthropic",
-    orgId: "anthropics/anthropic-ai",
-    id: "anthropics&anthropic-ai",
+    id: "anthropics/anthropic-ai",
   },
-  {
-    name: "Midjourney",
-    orgId: "midjourney/midjourney",
-    id: "midjourney&midjourney",
-  },
+  // {
+  //   name: "Midjourney",
+  //   id: "midjourney/midjourney",
+  // },
 ];
 
 export default function RepoSelection() {
@@ -55,7 +53,7 @@ export default function RepoSelection() {
                   <h2 className="text-xl font-semibold mb-1 truncate">
                     {repo.name}
                   </h2>
-                  <p className="text-sm text-gray-500 truncate">{repo.orgId}</p>
+                  <p className="text-sm text-gray-500 truncate">{repo.id}</p>
                 </CardHeader>
               </Card>
             </Link>
