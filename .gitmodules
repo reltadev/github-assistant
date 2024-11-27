@@ -1,3 +1,6 @@
 [submodule "relta"]
-	path = relta
+	path = server-poc/relta
+	url = https://github.com/reltadev/relta
+[submodule "server-poc/relta"]
+	path = server-poc/relta
 	url = https://github.com/reltadev/relta

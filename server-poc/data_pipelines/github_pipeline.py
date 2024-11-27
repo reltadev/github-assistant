@@ -1,78 +1,59 @@
 import dlt
-from .github import github_reactions, github_repo_events, github_stargazers
 
+from .github import github_reactions, github_stargazers
 
-def load_repo_reactions_issues_only(owner: str, repo: str, access_token: str | None = None) -> None:
-    """Loads issues, their comments and reactions for a given repository
-    
-    Args:
-        owner: The owner/organization of the repository
-        repo: The name of the repository
-        access_token: Optional GitHub access token
-    """
+DEFAULT_DIR='data'
+
+def load_issues_data(owner: str, repo: str, destination_dir: str = DEFAULT_DIR, access_token: str | None = None) -> None:
+    """Loads all issues and their reactions for the specified repo"""
     pipeline = dlt.pipeline(
         "github_issues",
-        destination=dlt.destinations.duckdb(f"data/{repo}_github_data.duckdb"),
+        destination=dlt.destinations.duckdb(f"{destination_dir}/{repo}_github_data.duckdb"),
         dataset_name="issues"
     )
+
+    # Initialize the data source with the specified parameters
     data = github_reactions(
-        owner, repo, items_per_page=100, max_items=100, access_token=access_token
-    ).with_resources("issues")
-    print(pipeline.run(data, refresh="drop_sources"))
-
-
-def load_repo_events(owner: str, repo: str, access_token: str | None = None) -> None:
-    """Loads repository events. Shows incremental loading.
+        owner=owner,
+        name=repo,
+        access_token=access_token,
+        items_per_page=100
+    ).with_resources('issues')
     
-    Args:
-        owner: The owner/organization of the repository
-        repo: The name of the repository
-        access_token: Optional GitHub access token
-    """
+    # Run the pipeline and print the outcome
+    load_info = pipeline.run(data, table_name="issues")
+    print(f"Loaded issues:{load_info}", load_info)
+
+def load_pull_requests_data(owner: str, repo: str, destination_dir: str = DEFAULT_DIR, access_token: str | None = None) -> None:
+    """Loads all pull requests and their reactions for the specified repo"""
     pipeline = dlt.pipeline(
-        "github_events", destination=dlt.destinations.duckdb(f"data/{repo}_github_data.duckdb"), dataset_name="events"
+        "github_prs",
+        destination=dlt.destinations.duckdb(f"{destination_dir}/{repo}_github_data.duckdb"),
+        dataset_name="pull_requests"
     )
-    data = github_repo_events(owner, repo, access_token=access_token)
-    print(pipeline.run(data, refresh="drop_sources"))
 
-
-def load_repo_all_data(owner: str, repo: str, access_token: str | None = None) -> None:
-    """Loads all issues, pull requests and comments for a given repository
+    # Initialize the data source with the specified parameters
+    data = github_reactions(
+        owner=owner,
+        name=repo,
+        access_token=access_token,
+        items_per_page=100
+    ).with_resources('pull_requests')
     
-    Args:
-        owner: The owner/organization of the repository
-        repo: The name of the repository
-        access_token: Optional GitHub access token
-    """
-    pipeline = dlt.pipeline(
-        "github_reactions",
-        destination=dlt.destinations.duckdb(f"data/{repo}_github_data.duckdb"),
-        dataset_name="reactions"
-    )
-    data = github_reactions(owner, repo, access_token=access_token)
-    print(pipeline.run(data, refresh="drop_sources"))
+    # Run the pipeline and print the outcome
+    load_info = pipeline.run(data, table_name="pull_requests")
+    print(f"Loaded pull requests:{load_info}")
 
-
-def load_repo_stargazers(owner: str, repo: str, access_token: str | None = None) -> None:
-    """Loads all stargazers for a given repository
+def load_stargazer_data(owner:str, repo:str, destination_dir: str = DEFAULT_DIR, access_token:str | None = None) -> None:
+    """Loads all stargazers for dlthub dlt repo"""
     
-    Args:
-        owner: The owner/organization of the repository
-        repo: The name of the repository
-        access_token: Optional GitHub access token
-    """
     pipeline = dlt.pipeline(
         "github_stargazers",
-        destination=dlt.destinations.duckdb(f"data/{repo}_github_data.duckdb"),
+        destination=dlt.destinations.duckdb(f"{destination_dir}/{repo}_github_data.duckdb"),
         dataset_name="stargazers"
     )
-    data = github_stargazers(owner, repo, access_token=access_token)
-    print(pipeline.run(data, refresh="drop_sources"))
+    data = github_stargazers(owner, repo, access_token= access_token)
+    print(pipeline.run(data))
 
 
-if __name__ == "__main__":
-    # Example usage with the original repositories
-    load_repo_reactions_issues_only("duckdb", "duckdb")
-    load_repo_events("apache", "airflow")
-    load_repo_all_data("dlt-hub", "dlt")
-    load_repo_stargazers("dlt-hub", "dlt")
+

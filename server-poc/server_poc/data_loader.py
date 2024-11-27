@@ -1,30 +1,40 @@
 from data_pipelines.github_pipeline import (
-    load_repo_reactions_issues_only,
-    load_repo_events,
-    load_repo_all_data,
-    load_repo_stargazers
+    load_issues_data,
+    load_pull_requests_data,
+    load_stargazer_data
 )
 from pydantic import BaseModel
 
 class GithubRepoInfo(BaseModel):
     owner: str
     repo: str
-    access_token: str | None = None  # Make token optional with default None
+    access_token: str | None = None
+    load_issues: bool = True
+    load_pull_requests: bool = True
+    load_stars: bool = True
 
 def load_data(repo_info: GithubRepoInfo):
     try:
-        print('loading github_data')
-        # Pass the access token to all pipeline functions
-        load_repo_stargazers(repo_info.owner, repo_info.repo, repo_info.access_token)
-        load_repo_reactions_issues_only(repo_info.owner, repo_info.repo, repo_info.access_token)
-        load_repo_events(repo_info.owner, repo_info.repo, repo_info.access_token)
-        #load_repo_all_data(repo_info.owner, repo_info.repo, repo_info.access_token)
+        print(f'Loading github data for {repo_info.owner}/{repo_info.repo}')
         
+        data_loaded = []
+        
+        if repo_info.load_stars:
+            load_stargazer_data(repo_info.owner, repo_info.repo, access_token=repo_info.access_token)
+            data_loaded.append("stars")
+            
+        if repo_info.load_issues:
+            load_issues_data(repo_info.owner, repo_info.repo, access_token=repo_info.access_token)
+            data_loaded.append("issues")
+            
+        if repo_info.load_pull_requests:
+            load_pull_requests_data(repo_info.owner, repo_info.repo, access_token=repo_info.access_token)
+            data_loaded.append("pull requests")
         
         return {
             "status": "success",
-            "message": f"Successfully loaded data for {repo_info.owner}/{repo_info.repo}"
+            "message": f"Successfully loaded {', '.join(data_loaded)} data for {repo_info.owner}/{repo_info.repo}"
         }
     except Exception as e:
         print(e)
-        raise ValueError("Error ")
+        raise ValueError(f"Error loading data: {str(e)}")

@@ -2,6 +2,24 @@
 !**/.relta/semantic_layer
 
 
+# Terraform files
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+crash.log
+crash.*.log
+*.tfplan
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+.terraform.lock.hcl
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
