@@ -5,9 +5,9 @@ import Link from "next/link";
 export default async function Home({
   params,
 }: {
-  params: Promise<{ repoId: string }>;
+  params: Promise<{ org: string; repo: string }>;
 }) {
-  const { repoId } = await params;
+  const { org, repo } = await params;
   return (
     <main className="h-dvh flex flex-col">
       <div className="border-b px-4">
@@ -16,12 +16,12 @@ export default async function Home({
             <ChevronLeft />
           </Link>
           <h1 className="text-2xl font-bold">
-            {repoId.replaceAll("%26", "/")}
+            {org}/{repo}
           </h1>
         </div>
       </div>
       <div className="flex-grow">
-        <MyAssistant repoId={repoId} />
+        <MyAssistant org={org} repo={repo} />
       </div>
     </main>
   );
