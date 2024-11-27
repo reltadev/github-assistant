@@ -2,7 +2,7 @@ import { openai } from "@ai-sdk/openai";
 import { getEdgeRuntimeResponse } from "@assistant-ui/react/edge";
 import { generateObject } from "ai";
 import { z } from "zod";
-import { getDataQuery, getTextQuery } from "./reltaApi";
+import { getDataQuery, getTextQuery } from "../../../lib/reltaApi";
 
 export const maxDuration = 30;
 

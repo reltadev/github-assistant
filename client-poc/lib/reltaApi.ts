@@ -33,3 +33,29 @@ export const getTextQuery = async (
 export const submitFeedback = async (type: string, message: string) => {
   console.log(type, message);
 };
+
+export const loadGithubData = async (
+  owner: string,
+  repo: string,
+  access_token: string
+) => {
+  const response = await fetch(`${BASE_URL}/load-github-data`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      owner,
+      repo,
+      access_token,
+      load_issues: true,
+      load_pull_requests: true,
+      load_stars: true,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to load GitHub data");
+  }
+};

@@ -1,4 +1,4 @@
-import { submitFeedback } from "../chat/reltaApi";
+import { submitFeedback } from "../../../lib/reltaApi";
 
 export const POST = async (request: Request) => {
   const { type, message } = await request.json();
