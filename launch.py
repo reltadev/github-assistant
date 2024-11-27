@@ -5,14 +5,14 @@ import argparse
 from concurrent.futures import ThreadPoolExecutor
 import inquirer
 
-def prompt_for_refresh():
+"""def prompt_for_refresh():
     questions = [
         inquirer.Confirm('refresh',
                         message="Existing GitHub data found. Do you want to refresh it?",
                         default=False),
     ]
     answers = inquirer.prompt(questions)
-    return answers['refresh'] if answers else False
+    return answers['refresh'] if answers else False"""
 
 def run_command(command, cwd=None, env=None):
     process = subprocess.Popen(
@@ -29,7 +29,8 @@ def run_command(command, cwd=None, env=None):
     process.wait()
 
 def main():
-    parser = argparse.ArgumentParser(
+    env = os.environ.copy()
+    """parser = argparse.ArgumentParser(
         description="Launch client and server with optional RELTA_SOURCE."
     )
     parser.add_argument(
@@ -42,7 +43,7 @@ def main():
     )
     args = parser.parse_args()
 
-    env = os.environ.copy()
+   
     if args.relta_source:
         env["RELTA_SOURCE"] = args.relta_source
 
@@ -50,7 +51,7 @@ def main():
     if os.path.exists('server-poc/data/github_issues.duckdb') and not args.force_refresh:
         should_refresh = prompt_for_refresh()
         if should_refresh:
-            env["FORCE_REFRESH"] = "1"
+            env["FORCE_REFRESH"] = "1"""
 
     commands = [
         ("npm install && npm run dev", "client-poc"),

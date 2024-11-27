@@ -92,9 +92,13 @@ resource "aws_iam_policy" "ecs_execution_policy" {
           "ecs:*",
           "elasticloadbalancing:*",
           "cloudwatch:*",
-          "logs:*"
+          "logs:*",
+          "s3:GetObject"
         ],
-        Resource : "*"
+        Resource : [
+          "*",
+          "arn:aws:s3:::github-assistant-env/.env"
+        ]
       }
     ]
   })
@@ -125,6 +129,12 @@ resource "aws_ecs_task_definition" "api" {
       name    = "${var.app_name}-api-container"
       image   = "${var.image}"
       command = ["poetry", "run", "uvicorn", "server_poc.server:app", "--host", "0.0.0.0", "--port", "80"]
+      environmentFiles = [
+        {
+          value = "arn:aws:s3:::github-assistant-env/.env"
+          type  = "s3"
+        }
+      ]
       portMappings = [
         {
           hostPort      = 80
