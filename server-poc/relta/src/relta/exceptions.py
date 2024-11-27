@@ -1,2 +1,0 @@
-class DuplicateResourceException(Exception):
-    pass
