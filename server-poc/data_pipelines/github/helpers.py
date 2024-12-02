@@ -4,7 +4,7 @@ from dlt.common.typing import DictStrAny, StrAny
 from dlt.common.utils import chunks
 from dlt.sources.helpers import requests
 
-from .queries import COMMENT_REACTIONS_QUERY, ISSUES_QUERY, STARGAZERS_QUERY, RATE_LIMIT
+from .queries import COMMENT_REACTIONS_QUERY, ISSUES_QUERY, STARGAZERS_QUERY, RATE_LIMIT, COMMITS_QUERY
 from .settings import GRAPHQL_API_BASE_URL, REST_API_BASE_URL
 
 
@@ -102,10 +102,37 @@ def get_reactions_data(
         yield map(_extract_nested_nodes, page_items)
 
 
+def get_commits(
+    owner: str,
+    name: str,
+    access_token: str,
+    items_per_page: int,
+    max_items: Optional[int],
+) -> Iterator[Iterator[StrAny]]:
+    variables = {
+        "owner": owner,
+        "name": name,
+        "items_per_page": items_per_page
+    }
+    
+    for page_items in _get_graphql_pages(
+        access_token, COMMITS_QUERY, variables, "object/history", max_items
+    ):
+        yield map(lambda item: item, page_items)
+
+
 def _extract_top_connection(data: StrAny, node_type: str) -> StrAny:
-    assert (
-        isinstance(data, dict) and len(data) == 1
-    ), f"The data with list of {node_type} must be a dictionary and contain only one element"
+    """Modified to handle nested paths like 'object/history'"""
+    assert isinstance(data, dict), f"The data with list of {node_type} must be a dictionary"
+    
+    # Handle nested paths
+    if '/' in node_type:
+        parts = node_type.split('/')
+        current = data['repository']
+        for part in parts:
+            current = current[part]
+        return current
+    
     data = next(iter(data.values()))
     return data[node_type]  # type: ignore
 

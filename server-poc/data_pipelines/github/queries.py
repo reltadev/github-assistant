@@ -113,3 +113,53 @@ query($owner: String!, $name: String!, $items_per_page: Int!, $page_after: Strin
   }
 }
 """
+
+COMMITS_QUERY = """
+query($owner: String!, $name: String!, $items_per_page: Int!, $page_after: String) {
+  repository(owner: $owner, name: $name) {
+    object(expression: "HEAD") {
+      ... on Commit {
+        history(first: $items_per_page, after: $page_after) {
+          pageInfo {
+            endCursor
+            startCursor
+          }
+          nodes {
+            oid
+            messageHeadline
+            message
+            committedDate
+            author {
+              name
+              email
+              user {
+                login
+                avatarUrl
+                url
+              }
+            }
+            committer {
+              name
+              email
+              user {
+                login
+                avatarUrl
+                url
+              }
+            }
+            additions
+            deletions
+            changedFiles
+          }
+        }
+      }
+    }
+  }
+  rateLimit {
+    limit
+    cost
+    remaining
+    resetAt
+  }
+}
+"""
