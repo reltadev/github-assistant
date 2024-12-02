@@ -20,6 +20,7 @@ import {
   ChartLegendContent,
 } from "@/components/ui/chart";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { MousePointerClickIcon } from "lucide-react";
 
 const getColumns = (data: object[]) => {
   const [xAxis, ...yAxis] = data.reduce<string[]>((acc, row) => {
@@ -157,10 +158,16 @@ export const ChartToolUI = makeAssistantToolUI<
 >({
   toolName: "chart",
   render: ({ result }) => {
-    if (!result || typeof result !== "object") return null;
+    if (!result || typeof result !== "object")
+      return (
+        <div className="flex items-center gap-1 animate-pulse">
+          <MousePointerClickIcon className="size-4" />
+          <span>Querying Relta...</span>
+        </div>
+      );
 
     return (
-      <Card className="">
+      <Card>
         <CardHeader className="py-4 text-center">Chart</CardHeader>
         <CardContent className="pb-4">
           <MyChart config={result} />

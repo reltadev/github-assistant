@@ -46,7 +46,7 @@ export const POST = async (request: Request) => {
             query: z.string().describe("The query to provide the agent."),
           }),
           execute: async (requestData) => {
-            const rows = await getDataQuery(requestData.query);
+            const rows = await getDataQuery(org, repo, requestData.query);
             const type = await classifyChartType(rows);
             return { type, rows };
           },
