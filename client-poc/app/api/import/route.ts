@@ -6,7 +6,7 @@ export const runtime = "edge";
 export const maxDuration = 60;
 
 export async function POST(request: Request) {
-  const { org, repo } = await request.json();
+  const { owner, repo } = await request.json();
 
   const { userId } = await auth();
   if (!userId) throw new Error("User not signed in");
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
   );
   const accessToken = tokens.data[0].token;
 
-  await loadGithubData(org, repo, accessToken);
+  await loadGithubData(owner, repo, accessToken);
 
   return new Response("Success", { status: 200 });
 }

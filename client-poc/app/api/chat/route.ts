@@ -32,12 +32,12 @@ If a question is best answered by displaying a graph/chart, use the "chart" tool
 If a question is about a single data point (e.g. "who made the most recent commit?"), use the "text" tool.`;
 
 export const POST = async (request: Request) => {
-  const { org, repo, ...requestData } = await request.json();
+  const { owner, repo, ...requestData } = await request.json();
 
   return getEdgeRuntimeResponse({
     options: {
       model,
-      system: getRouterSystemPrompt(`${org}/${repo}`),
+      system: getRouterSystemPrompt(`${owner}/${repo}`),
       tools: {
         chart: {
           description:
@@ -46,7 +46,7 @@ export const POST = async (request: Request) => {
             query: z.string().describe("The query to provide the agent."),
           }),
           execute: async (requestData) => {
-            const rows = await getDataQuery(org, repo, requestData.query);
+            const rows = await getDataQuery(owner, repo, requestData.query);
             const type = await classifyChartType(rows);
             return { type, rows };
           },
@@ -58,7 +58,7 @@ export const POST = async (request: Request) => {
             query: z.string().describe("The query to provide the agent."),
           }),
           execute: async (requestData) => {
-            const text = await getTextQuery(org, repo, requestData.query);
+            const text = await getTextQuery(owner, repo, requestData.query);
             return text;
           },
         },

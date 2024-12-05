@@ -65,15 +65,16 @@ export function NewRepositoryDialog({ trigger }: NewRepositoryDialogProps) {
   };
 
   const onSubmit = async (data: NewRepoFormData) => {
-    const { org, repo } = data.githubUrl.match(GITHUB_URL_REGEX)?.groups ?? {};
-    if (!org || !repo) return;
+    const { owner, repo } =
+      data.githubUrl.match(GITHUB_URL_REGEX)?.groups ?? {};
+    if (!owner || !repo) return;
 
     await fetch("/api/import", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ org, repo }),
+      body: JSON.stringify({ owner, repo }),
     });
   };
 
