@@ -1,0 +1,83 @@
+{
+  "name": "pr_metrics",
+  "description": "Metrics related to pull requests in the GitHub repository, including counts, user interactions, and time-based metrics.",
+  "datasource": "yonom_assistantui",
+  "dimensions": [
+    {
+      "name": "pr_number",
+      "description": "The unique number identifying a pull request.",
+      "categories": null,
+      "dtype": "BIGINT"
+    },
+    {
+      "name": "pr_title",
+      "description": "The title of the pull request.",
+      "categories": null,
+      "dtype": "VARCHAR"
+    },
+    {
+      "name": "pr_body",
+      "description": "The body or description of the pull request.",
+      "categories": null,
+      "dtype": "VARCHAR"
+    },
+    {
+      "name": "pr_author_login",
+      "description": "The login of the user who created the pull request.",
+      "categories": null,
+      "dtype": "VARCHAR"
+    },
+    {
+      "name": "pr_created_at",
+      "description": "The timestamp when the pull request was created.",
+      "categories": null,
+      "dtype": "TIMESTAMP WITH TIME ZONE"
+    },
+    {
+      "name": "pr_closed_at",
+      "description": "The timestamp when the pull request was closed, if applicable.",
+      "categories": null,
+      "dtype": "TIMESTAMP WITH TIME ZONE"
+    },
+    {
+      "name": "pr_state",
+      "description": "The current state of the pull request (e.g., open, closed).",
+      "categories": [
+        "OPEN",
+        "MERGED",
+        "CLOSED"
+      ],
+      "dtype": "VARCHAR"
+    }
+  ],
+  "measures": [
+    {
+      "name": "total_prs",
+      "description": "The total number of pull requests created.",
+      "expr": "COUNT(pr_number)"
+    },
+    {
+      "name": "average_time_to_close_pr",
+      "description": "The average time taken to close a pull request.",
+      "expr": "AVG(EXTRACT(EPOCH FROM (pr_closed_at - pr_created_at)))"
+    },
+    {
+      "name": "open_prs",
+      "description": "The number of pull requests that are currently open.",
+      "expr": "SUM(CASE WHEN pr_state = 'OPEN' THEN 1 ELSE 0 END)"
+    },
+    {
+      "name": "most_pr_comments",
+      "description": "The pull request with the most comments.",
+      "expr": "MAX(comments_total_count)"
+    }
+  ],
+  "sample_questions": [
+    "How many PRs were created by the repo owners vs contributors?",
+    "How many open PRs are there?",
+    "How long does the average PR stay open?",
+    "What was the longest open PR? How long was it open?",
+    "How many comments did PR 869 have?"
+  ],
+  "sql_to_underlying_datasource": "SELECT number AS pr_number, title AS pr_title, body AS pr_body, author__login AS pr_author_login, created_at AS pr_created_at, closed_at AS pr_closed_at, state AS pr_state, comments_total_count FROM pull_requests.pull_requests"
+}

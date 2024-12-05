@@ -1,0 +1,54 @@
+{
+  "name": "stargazer_metrics",
+  "description": "Metrics related to stargazers in the GitHub repository, including counts and user interactions.",
+  "datasource": "yonom_assistantui",
+  "dimensions": [
+    {
+      "name": "starred_at",
+      "description": "The timestamp when the star was given.",
+      "categories": null,
+      "dtype": "TIMESTAMP WITH TIME ZONE"
+    },
+    {
+      "name": "stargazer_login",
+      "description": "The login of the user who gave the star.",
+      "categories": null,
+      "dtype": "VARCHAR"
+    }
+  ],
+  "measures": [
+    {
+      "name": "total_stars",
+      "description": "The total number of stars the repository has received.",
+      "expr": "COUNT(stargazer_login)"
+    },
+    {
+      "name": "first_star_giver",
+      "description": "The user who gave the first star to the repository.",
+      "expr": "MIN(stargazer_login)"
+    },
+    {
+      "name": "last_star_giver",
+      "description": "The user who gave the last star to the repository.",
+      "expr": "MAX(stargazer_login)"
+    },
+    {
+      "name": "stars_given_in_november",
+      "description": "The number of stars given in November.",
+      "expr": "SUM(CASE WHEN EXTRACT(MONTH FROM starred_at) = 11 THEN 1 ELSE 0 END)"
+    },
+    {
+      "name": "most_stars_given_day",
+      "description": "The day when the most stars were given.",
+      "expr": "MAX(EXTRACT(DAY FROM starred_at))"
+    }
+  ],
+  "sample_questions": [
+    "How many stars does the repo have?",
+    "Who gave the first star, last star?",
+    "What gave stars in November?",
+    "What day were the most stars given?",
+    "What days of the week were most stars given?"
+  ],
+  "sql_to_underlying_datasource": "SELECT starred_at, user__login AS stargazer_login FROM stargazers.stargazers"
+}

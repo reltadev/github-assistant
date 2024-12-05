@@ -16,7 +16,6 @@ import traceback
     
 load_dotenv()
 
-TEMPLATE_SOURCE_NAME = "yonom_assistantui"
 
 app = FastAPI()
 
@@ -62,7 +61,6 @@ def _get_repo_source_name(owner: str, repo_name: str) -> str:
 
 
 def _create_relta_source_and_deploy_semantic_layer(owner: str, repo_name: str) -> DataSource:
-    template_source = server_state.client.get_datasource(TEMPLATE_SOURCE_NAME)
     with Session(server_state.engine) as session:
         # Get a fresh copy of the repo object within this session
         repo = session.exec(
@@ -71,12 +69,24 @@ def _create_relta_source_and_deploy_semantic_layer(owner: str, repo_name: str) -
             .where(GithubRepoInfo.repo==repo_name)
         ).first()
     
+        if repo is None:
+            raise HTTPException(
+                status_code=404,
+                detail="The repo is not connected"
+            )
+
+        if repo.pipeline_status == PipelineStatus.FAILED or repo.pipeline_status == PipelineStatus.RUNNING:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Data not accessible. The pipeline is {repo.pipeline_status}"
+            )
+
         source = server_state.client.get_or_create_datasource(
             connection_uri=f"{server_state.database_uri}/{repo.source_name()}",
             name=repo.source_name()
         )
 
-        source.semantic_layer.copy(template_source)
+        source.semantic_layer.load(path='semantic_layer/')
         source.deploy()
 
         return source
@@ -154,8 +164,8 @@ def initialize_server(force_refresh: bool = False):
 @app.post("/data")
 def add_prompt_get_data(prompt: Prompt, owner: str, repo_name: str, background_task: BackgroundTasks):
     # Check repo name validity before entering try block
+    source = _create_relta_source_and_deploy_semantic_layer(owner, repo_name)       
     try:
-        source = _create_relta_source_and_deploy_semantic_layer(owner, repo_name)       
         chat = server_state.client.create_chat(source)
         background_task.add_task(record_user_prompt, prompt.prompt, owner, repo_name, PromptType.FULL_TEXT)
         response = chat.prompt(prompt.prompt, mode='data_only')
@@ -175,8 +185,8 @@ def add_prompt_get_data(prompt: Prompt, owner: str, repo_name: str, background_t
 @app.post("/prompt")
 def add_prompt_to_chat(prompt: Prompt, owner:str,  repo_name: str, background_task: BackgroundTasks):
     # Check repo_name validity before entering try block
-    try:        
-        source = _create_relta_source_and_deploy_semantic_layer(owner, repo_name)       
+    source = _create_relta_source_and_deploy_semantic_layer(owner, repo_name)
+    try:               
         background_task.add_task(record_user_prompt, prompt.prompt, owner, repo_name, PromptType.FULL_TEXT)
         chat = server_state.client.create_chat(source)
         response = chat.prompt(prompt.prompt, debug=True)
@@ -243,12 +253,16 @@ def background_pipeline_run(repo_id: int, access_token: str):
             repo.load_data(access_token)
             # Commit the changes
             session.add(repo)
-            _create_relta_source_and_deploy_semantic_layer(repo.owner, repo.repo)       
             session.commit()
+            _create_relta_source_and_deploy_semantic_layer(repo.owner, repo.repo)       
+            
             
             
         except Exception as e:
-            session.rollback()
+            repo.last_pipeline_run = datetime.now()
+            repo.pipeline_status = PipelineStatus.FAILED
+            session.add(repo)
+            session.commit()
             raise e
 
 @app.post("/load-github-data", status_code=201)
