@@ -7,7 +7,7 @@ export const getDataQuery = async (
   prompt: string
 ) => {
   const response = await fetch(
-    `${BASE_URL}/data?org=${owner}&repo_name=${repo}`,
+    `${BASE_URL}/data?owner=${owner}&repo_name=${repo}`,
     {
       method: "POST",
       headers: {
@@ -27,7 +27,7 @@ export const getTextQuery = async (
   prompt: string
 ) => {
   const response = await fetch(
-    `${BASE_URL}/prompt?org=${owner}&repo_name=${repo}`,
+    `${BASE_URL}/prompt?owner=${owner}&repo_name=${repo}`,
     {
       method: "POST",
       headers: {
