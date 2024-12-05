@@ -9,14 +9,14 @@ import { TextToolUI } from "./tools/TextToolUI";
 const MarkdownText = makeMarkdownText();
 
 type MyAssistantProps = {
-  org: string;
+  owner: string;
   repo: string;
 };
 
-export function MyAssistant({ org, repo }: MyAssistantProps) {
+export function MyAssistant({ owner, repo }: MyAssistantProps) {
   const runtime = useEdgeRuntime({
     api: "/api/chat",
-    body: { org, repo },
+    body: { owner, repo },
     adapters: {
       feedback: {
         submit: async ({ type, message }) => {

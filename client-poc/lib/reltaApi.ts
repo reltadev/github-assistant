@@ -2,12 +2,12 @@ const BASE_URL =
   "http://github-assistant-alb-1250589316.us-east-1.elb.amazonaws.com";
 
 export const getDataQuery = async (
-  org: string,
+  owner: string,
   repo: string,
   prompt: string
 ) => {
   const response = await fetch(
-    `${BASE_URL}/data?org=${org}&repo_name=${repo}`,
+    `${BASE_URL}/data?org=${owner}&repo_name=${repo}`,
     {
       method: "POST",
       headers: {
@@ -22,12 +22,12 @@ export const getDataQuery = async (
 };
 
 export const getTextQuery = async (
-  org: string,
+  owner: string,
   repo: string,
   prompt: string
 ) => {
   const response = await fetch(
-    `${BASE_URL}/prompt?org=${org}&repo_name=${repo}`,
+    `${BASE_URL}/prompt?org=${owner}&repo_name=${repo}`,
     {
       method: "POST",
       headers: {
