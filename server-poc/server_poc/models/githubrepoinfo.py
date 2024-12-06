@@ -28,10 +28,10 @@ class GithubRepoInfo(SQLModel, table=True):
     last_pipeline_run: datetime | None = None
     access_token: str | None = None
     pipeline_status: PipelineStatus | None = None 
-    load_issues: bool = Field(default=True)
-    load_pull_requests: bool = Field(default=True)
-    load_stars: bool = Field(default=True)
-    load_commits: bool = Field(default=True)
+    loaded_issues: bool = Field(default=True)
+    loaded_pull_requests: bool = Field(default=True)
+    loaded_stars: bool = Field(default=True)
+    loaded_commits: bool = Field(default=True)
 
 
     def setup_destination_db(self, database_uri):
@@ -46,46 +46,53 @@ class GithubRepoInfo(SQLModel, table=True):
 
 
 
-    def load_data(self, access_token: str):
+    def load_data(self, access_token: str, load_issues=True, load_pull_requests=True, 
+                 load_stars=True, load_commits=True):
         """Loads data for the repo from the GitHub API into postgres using DLT helper files"""
-        try:
-            print(f'Loading github data for {self.owner}/{self.repo}')
-            
-            data_loaded = []
-            DATABASE_URI = os.environ.get('GITHUB_DATABASE_CONNECTION_URI')
-            destination_url = f"{DATABASE_URI}/{self.source_name()}"
-            
-            if self.load_stars:
-                load_stargazer_data(self.owner, self.repo, destination_url, access_token=access_token)
-                data_loaded.append("stars")
-                
-            if self.load_issues:
-                load_issues_data(self.owner, self.repo, destination_url, access_token=access_token)
-                data_loaded.append("issues")
-                
-            if self.load_pull_requests:
-                load_pull_requests_data(self.owner, self.repo, destination_url, access_token=access_token)
-                data_loaded.append("pull requests")
-
-            if self.load_commits:
-                load_commit_data(self.owner, self.repo, destination_url, access_token=access_token)
-                data_loaded.append("commits")
-
-            # Update the instance attributes
-            self.last_pipeline_run = datetime.now()
-            self.pipeline_status = PipelineStatus.SUCCESS
-            
-            return {
-                "status": "success",
-                "message": f"Successfully loaded {', '.join(data_loaded)} data for {self.owner}/{self.repo}",
-                "last_refresh": self.last_pipeline_run.isoformat()
-            }
-        except Exception as e:
-            self.last_pipeline_run = datetime.now()
-            self.pipeline_status = PipelineStatus.FAILED
-            print(e)
-            raise ValueError(f"Error loading data: {str(e)}")
+        print(f'Loading github data for {self.owner}/{self.repo}')
         
+        DATABASE_URI = os.environ.get('GITHUB_DATABASE_CONNECTION_URI')
+        destination_url = f"{DATABASE_URI}/{self.source_name()}"
+        
+        # Reset loaded flags
+        self.loaded_stars = False
+        self.loaded_issues = False
+        self.loaded_pull_requests = False
+        self.loaded_commits = False
+        
+        if load_stars:
+            try:
+                load_stargazer_data(self.owner, self.repo, destination_url, access_token=access_token)
+                self.loaded_stars = True
+            except Exception as e:
+                print(f"Failed to load star data: {e}")
+                
+        if load_issues:
+            try:
+                load_issues_data(self.owner, self.repo, destination_url, access_token=access_token)
+                self.loaded_issues = True
+            except Exception as e:
+                print(f"Failed to load issues data: {e}")
+                
+        if load_pull_requests:
+            try:
+                load_pull_requests_data(self.owner, self.repo, destination_url, access_token=access_token)
+                self.loaded_pull_requests = True
+            except Exception as e:
+                print(f"Failed to load pull requests data: {e}")
+
+        if load_commits:
+            try:
+                load_commit_data(self.owner, self.repo, destination_url, access_token=access_token)
+                self.loaded_commits = True
+            except Exception as e:
+                print(f"Failed to load commit data: {e}")
+
+        # If nothing was loaded successfully, raise an exception
+        if not any([self.loaded_stars, self.loaded_issues, 
+                    self.loaded_pull_requests, self.loaded_commits]):
+            raise Exception("Failed to load any data")
+
 
     def source_name(self) -> str:
         """lowercase and remove special characters"""
