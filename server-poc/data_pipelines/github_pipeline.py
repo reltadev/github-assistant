@@ -1,17 +1,10 @@
 import dlt
-import os
-
-
-
 from .github import github_reactions, github_stargazers, github_commits
-
-
-
 
 def load_issues_data(owner: str, repo: str, destination: str, access_token: str | None = None) -> None:
     """Loads all issues and their reactions for the specified repo"""
     pipeline = dlt.pipeline(
-        "github_issues",
+        f"{owner.lower()}_{repo.lower()}_github_issues",
         destination=dlt.destinations.postgres(destination),
         dataset_name="issues"
     )
@@ -32,7 +25,7 @@ def load_pull_requests_data(owner: str, repo: str, destination: str, access_toke
     """Loads all pull requests and their reactions for the specified repo"""
     print(destination)
     pipeline = dlt.pipeline(
-        "github_prs",
+         f"{owner.lower()}_{repo.lower()}_github_prs",
         destination=dlt.destinations.postgres(destination),
         dataset_name="pull_requests"
     )
@@ -52,7 +45,7 @@ def load_pull_requests_data(owner: str, repo: str, destination: str, access_toke
 def load_stargazer_data(owner:str, repo:str, destination: str, access_token:str | None = None) -> None:
     """Loads all stargazers for dlthub dlt repo"""
     pipeline = dlt.pipeline(
-        "github_stargazers",
+        f"{owner.lower()}_{repo.lower()}_github_stargazers",
         destination=dlt.destinations.postgres(destination),
         dataset_name="stargazers"
     )
@@ -62,7 +55,7 @@ def load_stargazer_data(owner:str, repo:str, destination: str, access_token:str 
 def load_commit_data(owner: str, repo: str, destination: str, access_token: str | None = None) -> None:
     """Loads all commits for the specified repo"""
     pipeline = dlt.pipeline(
-        "github_commits",
+        f"{owner.lower()}_{repo.lower()}_github_commits",
         destination=dlt.destinations.postgres(destination),
         dataset_name="commits"
     )

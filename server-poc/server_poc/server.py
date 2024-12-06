@@ -45,7 +45,7 @@ def _get_repo_source_name(owner: str, repo_name: str) -> str:
         repo_info = session.exec(
              select(GithubRepoInfo)
                 .where(GithubRepoInfo.owner == owner)
-                .where(GithubRepoInfo.repo == repo_name)
+                .where(GithubRepoInfo.repo_name == repo_name)
             ).first()        
 
     
@@ -65,8 +65,8 @@ def _create_relta_source_and_deploy_semantic_layer(owner: str, repo_name: str) -
         # Get a fresh copy of the repo object within this session
         repo = session.exec(
             select(GithubRepoInfo)
-            .where(GithubRepoInfo.owner== owner)
-            .where(GithubRepoInfo.repo==repo_name)
+            .where(GithubRepoInfo.owner== owner.lower())
+            .where(GithubRepoInfo.repo_name==repo_name.lower())
         ).first()
     
         if repo is None:
@@ -173,35 +173,34 @@ def initialize_server(force_refresh: bool = False):
 
 
 
-@app.post("/data")
+@app.post("/data", tags=["prompt"])
 def add_prompt_get_data(prompt: Prompt, owner: str, repo_name: str, background_task: BackgroundTasks):
     # Check repo name validity before entering try block
-    try:
-        with Session(server_state.engine) as session:
-            repo_info = session.exec(
-                select(GithubRepoInfo)
-                .where(GithubRepoInfo.owner == owner)
-                .where(GithubRepoInfo.repo == repo_name)
-            ).first()
-            
-            if repo_info is None:
-                raise HTTPException(
-                    status_code=404,
-                    detail=f"Repository '{owner}/{repo_name}' not found"
-                )
-            
-            if repo_info.pipeline_status == PipelineStatus.RUNNING:
-                return {
-                    "status": "RUNNING",
-                    "message": "Pipeline is currently running. Please try again later."
-                }
-            
-            if repo_info.pipeline_status == PipelineStatus.FAILED:
-                return {
-                    "status": "FAILED",
-                    "message": "Pipeline failed to load data. Please try reloading the data."
-                }
+    with Session(server_state.engine) as session:
+        repo_info = session.exec(
+            select(GithubRepoInfo)
+            .where(GithubRepoInfo.owner == owner.lower())
+            .where(GithubRepoInfo.repo_name == repo_name.lower())
+        ).first()
         
+        if repo_info is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Repository '{owner}/{repo_name}' not found"
+            )
+        
+        if repo_info.pipeline_status == PipelineStatus.RUNNING:
+            return {
+                "status": "RUNNING",
+                "message": "Pipeline is currently running. Please try again later."
+            }
+        
+        if repo_info.pipeline_status == PipelineStatus.FAILED:
+            return {
+                "status": "FAILED",
+                "message": "Pipeline failed to load data. Please try reloading the data."
+            }
+    try:
         source = _create_relta_source_and_deploy_semantic_layer(owner, repo_name)       
         chat = server_state.client.create_chat(source)
         background_task.add_task(record_user_prompt, prompt.prompt, owner, repo_name, PromptType.FULL_TEXT)
@@ -209,7 +208,7 @@ def add_prompt_get_data(prompt: Prompt, owner: str, repo_name: str, background_t
         if response.sql is not None:
             response.sql_result = _format_data(sql=response.sql, data = response.sql_result)
         return response
-        
+    
     except Exception as e:
         print(traceback.format_exc())
         print(e)
@@ -219,34 +218,34 @@ def add_prompt_get_data(prompt: Prompt, owner: str, repo_name: str, background_t
         )
 
 
-@app.post("/prompt")
+@app.post("/prompt", tags=["prompt"])
 def add_prompt_to_chat(prompt: Prompt, owner:str, repo_name: str, background_task: BackgroundTasks):
-    try:
-        with Session(server_state.engine) as session:
-            repo_info = session.exec(
-                select(GithubRepoInfo)
-                .where(GithubRepoInfo.owner == owner)
-                .where(GithubRepoInfo.repo == repo_name)
-            ).first()
-            
-            if repo_info is None:
-                raise HTTPException(
-                    status_code=404,
-                    detail=f"Repository '{owner}/{repo_name}' not found"
-                )
-            
-            if repo_info.pipeline_status == PipelineStatus.RUNNING:
-                return {
-                    "status": "RUNNING",
-                    "message": "Pipeline is currently running. Please try again later."
-                }
-            
-            if repo_info.pipeline_status == PipelineStatus.FAILED:
-                return {
-                    "status": "FAILED",
-                    "message": "Pipeline failed to load data. Please try reloading the data."
-                }
+   
+    with Session(server_state.engine) as session:
+        repo_info = session.exec(
+            select(GithubRepoInfo)
+            .where(GithubRepoInfo.owner == owner.lower())
+            .where(GithubRepoInfo.repo_name == repo_name.lower())
+        ).first()
         
+        if repo_info is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Repository '{owner}/{repo_name}' not found"
+            )
+        
+        if repo_info.pipeline_status == PipelineStatus.RUNNING:
+            return {
+                "status": "RUNNING",
+                "message": "Pipeline is currently running. Please try again later."
+            }
+        
+        if repo_info.pipeline_status == PipelineStatus.FAILED:
+            return {
+                "status": "FAILED",
+                "message": "Pipeline failed to load data. Please try reloading the data."
+            }
+    try:
         source = _create_relta_source_and_deploy_semantic_layer(owner, repo_name)
         background_task.add_task(record_user_prompt, prompt.prompt, owner, repo_name, PromptType.FULL_TEXT)
         chat = server_state.client.create_chat(source)
@@ -261,7 +260,7 @@ def add_prompt_to_chat(prompt: Prompt, owner:str, repo_name: str, background_tas
             detail="An unknown error occurred"
         )
 
-@app.post("/feedback")
+@app.post("/feedback", tags=["feedback"])
 def record_feedback(feedback: Feedback):
     if feedback.type == "positive":
         print("ignoring positive feedback")
@@ -286,14 +285,14 @@ def record_feedback(feedback: Feedback):
 async def root():
     return {"message": "hello"}
 
-@app.get("/repo-info")
+@app.get("/repo-info", tags=["repos"])
 def get_repo_info(owner: str, repo_name: str):
     """Get repository information for a given owner and repo name."""
     with Session(server_state.engine) as session:
         repo_info = session.exec(
             select(GithubRepoInfo)
-            .where(GithubRepoInfo.owner == owner)
-            .where(GithubRepoInfo.repo == repo_name)
+            .where(GithubRepoInfo.owner == owner.lower())
+            .where(GithubRepoInfo.repo_name == repo_name.lower())
         ).first()
         
         if repo_info is None:
@@ -302,8 +301,10 @@ def get_repo_info(owner: str, repo_name: str):
                 detail=f"Repository '{owner}/{repo_name}' not found"
             )
         
-        # Convert to dict to make it JSON serializable
-        return repo_info.model_dump()
+        # Convert to dict and modify pipeline_status to be string
+        repo_dict = repo_info.model_dump()
+        repo_dict['pipeline_status'] = repo_info.pipeline_status.name
+        return repo_dict
 
 def record_user_prompt(prompt: str, owner: str, repo_name: str, prompt_type: PromptType):
     with Session(server_state.engine) as session:
@@ -344,7 +345,7 @@ def background_pipeline_run(repo_id: int, access_token: str, **load_options):
         
     #_create_relta_source_and_deploy_semantic_layer(repo.owner, repo.repo)  
 
-@app.post("/load-github-data", status_code=201)
+@app.post("/load-github-data", tags=["repos"], status_code=201)
 async def load_github_data(
     owner: str,
     repo_name: str,
@@ -360,8 +361,8 @@ async def load_github_data(
         with Session(server_state.engine) as session:
             repo_info = session.exec(
                 select(GithubRepoInfo)
-                .where(GithubRepoInfo.owner == owner)
-                .where(GithubRepoInfo.repo == repo_name)
+                .where(GithubRepoInfo.owner == owner.lower())
+                .where(GithubRepoInfo.repo_name == repo_name.lower())
             ).first()            
 
             if repo_info is not None:
@@ -390,19 +391,18 @@ async def load_github_data(
                     return {
                         "status": "RUNNING",
                         "message": "Pipeline run trigerred",
-                        "last_refresh": repo_info.last_pipeline_run.isoformat(),
+                        "last_refresh": repo_info.last_pipeline_run
                     }
                 else:
                     return {
                         "status": "SUCCESS",
                         "message": "Data is up to date",
-                        "last_refresh": repo_info.last_pipeline_run.isoformat()
+                        "last_refresh": repo_info.last_pipeline_run
                     }
             else:
                 repo_info = GithubRepoInfo(
-                    owner=owner,
-                    repo=repo_name,
-                    access_token=access_token
+                    owner=owner.lower(),
+                    repo_name=repo_name.lower()
                 )
                 repo_info.setup_destination_db(server_state.database_uri)
                 repo_info.pipeline_status = PipelineStatus.RUNNING
@@ -428,6 +428,21 @@ async def load_github_data(
             status_code=500,
             detail=f"Failed to load GitHub data: {str(e)}"
         )
+
+@app.get("/repos", tags=["repos"])
+def get_repos():
+    """Get information about all GitHub repositories."""
+    with Session(server_state.engine) as session:
+        repos = session.exec(select(GithubRepoInfo)).all()
+        
+        # Convert to list of dicts and modify pipeline_status to be string
+        repos_list = []
+        for repo in repos:
+            repo_dict = repo.model_dump()
+            repo_dict['pipeline_status'] = repo.pipeline_status.name
+            repos_list.append(repo_dict)
+            
+        return repos_list
 
 # Initialize server when module loads
 initialize_server(force_refresh=bool(os.environ.get('FORCE_REFRESH')))
