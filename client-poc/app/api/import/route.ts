@@ -18,9 +18,10 @@ export async function POST(request: Request) {
   );
   const accessToken = tokens.data[0].token;
 
-  await new ReltaApiClient({ owner, repo_name: repo }).loadGithubData(
-    accessToken
-  );
+  const info = await new ReltaApiClient({
+    owner,
+    repo_name: repo,
+  }).loadGithubData(accessToken);
 
-  return new Response("Success", { status: 200 });
+  return Response.json(info, { status: 200 });
 }

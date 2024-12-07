@@ -24,9 +24,10 @@ import {
 } from "@/components/ui/form";
 import { useAuth, useSignIn } from "@clerk/nextjs";
 import { MouseEvent } from "react";
+import { useRouter } from "next/navigation";
 
 const GITHUB_URL_REGEX =
-  /^https?:\/\/(?:www\.)?github\.com\/(?<org>[^\/]+)\/(?<repo>[^\/]+)(?:\/.*)?(?:\.git)?\/?$/;
+  /^https?:\/\/(?:www\.)?github\.com\/(?<owner>[^\/]+)\/(?<repo>[^\/]+)(?:\/.*)?(?:\.git)?\/?$/;
 
 const newRepoSchema = z.object({
   githubUrl: z
@@ -64,6 +65,7 @@ export function NewRepositoryDialog({ trigger }: NewRepositoryDialogProps) {
     }
   };
 
+  const router = useRouter();
   const onSubmit = async (data: NewRepoFormData) => {
     const { owner, repo } =
       data.githubUrl.match(GITHUB_URL_REGEX)?.groups ?? {};
@@ -76,6 +78,7 @@ export function NewRepositoryDialog({ trigger }: NewRepositoryDialogProps) {
       },
       body: JSON.stringify({ owner, repo }),
     });
+    router.push(`/repo/${owner}/${repo}`);
   };
 
   return (

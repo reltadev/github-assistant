@@ -1,17 +1,19 @@
+import { generateId } from "ai";
+
 interface ReltaApiConfig {
   owner: string;
   repo_name: string;
   baseUrl?: string;
 }
 
-type RepoInfo = {
+export type RepoInfo = {
   owner: string;
   last_pipeline_run: string | null;
   id: number;
   loaded_issues: boolean;
   loaded_stars: boolean;
   repo_name: string;
-  pipeline_status: "SUCCESS";
+  pipeline_status: "SUCCESS" | "RUNNING";
   loaded_pull_requests: boolean;
   loaded_commits: boolean;
 };
@@ -35,8 +37,9 @@ export class ReltaApiClient {
     endpoint: string,
     options: {
       method?: string;
+      query?: object;
       body?: object;
-      repoLocation?: "query" | "body" | "none";
+      sendRepo?: boolean;
     } = {}
   ) {
     const repoData = {
@@ -44,15 +47,10 @@ export class ReltaApiClient {
       repo_name: this.repo_name,
     };
 
-    const queryParams =
-      (options.repoLocation ?? "query") === "query"
-        ? new URLSearchParams(repoData).toString()
-        : "";
-
-    const body =
-      options.repoLocation === "body"
-        ? { ...repoData, ...options.body }
-        : options.body;
+    const queryParams = new URLSearchParams({
+      ...(options.sendRepo ?? true ? repoData : undefined),
+      ...options.query,
+    }).toString();
 
     const url = `${this.baseUrl}${endpoint}${
       queryParams ? `?${queryParams}` : ""
@@ -64,7 +62,7 @@ export class ReltaApiClient {
         "Content-Type": "application/json",
         Accept: "application/json",
       },
-      ...(body ? { body: JSON.stringify(body) } : {}),
+      ...(options.body ? { body: JSON.stringify(options.body) } : {}),
     });
 
     if (!response.ok) {
@@ -100,26 +98,25 @@ export class ReltaApiClient {
   }
 
   async getRepoInfo(): Promise<RepoInfo> {
-    return await this.fetchJson("repo-info");
+    return await this.fetchJson("repo-info", {
+      query: {
+        request_id: generateId(),
+      },
+    });
   }
 
   static async getRepos(): Promise<RepoInfo[]> {
     return await new ReltaApiClient({ owner: "", repo_name: "" }).fetchJson(
       "repos",
-      { repoLocation: "none" }
+      { sendRepo: false }
     );
   }
 
-  async loadGithubData(access_token: string): Promise<void> {
-    await this.fetchJson("load-github-data", {
+  async loadGithubData(access_token: string): Promise<RepoInfo> {
+    return await this.fetchJson("load-github-data", {
       method: "POST",
-      repoLocation: "body",
-      body: {
+      query: {
         access_token,
-        load_issues: true,
-        load_pull_requests: true,
-        load_stars: true,
-        load_commits: true,
       },
     });
   }
