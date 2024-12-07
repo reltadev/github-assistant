@@ -10,6 +10,7 @@ import {
   Line,
   LineChart,
   XAxis,
+  YAxis,
 } from "recharts";
 import { makeAssistantToolUI } from "@assistant-ui/react";
 import {
@@ -131,10 +132,14 @@ const MyChart: FC<{ config: ChartConfig }> = ({ config }) => {
         <CartesianGrid vertical={false} />
         <XAxis
           dataKey={xAxis}
-          tickLine={false}
           tickMargin={10}
+          tickLine={false}
           axisLine={false}
-          tickFormatter={(value) => value.slice(0, 3)}
+        />
+        <YAxis
+          tickMargin={10}
+          tickLine={false}
+          axisLine={false}
         />
         <ChartTooltip content={<ChartTooltipContent />} />
         <ChartLegend content={<ChartLegendContent />} />
