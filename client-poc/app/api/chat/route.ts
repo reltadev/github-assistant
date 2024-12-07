@@ -2,7 +2,7 @@ import { openai } from "@ai-sdk/openai";
 import { getEdgeRuntimeResponse } from "@assistant-ui/react/edge";
 import { generateObject } from "ai";
 import { z } from "zod";
-import { getDataQuery, getTextQuery } from "../../../lib/reltaApi";
+import { ReltaApiClient } from "../../../lib/reltaApi";
 
 export const maxDuration = 30;
 
@@ -34,6 +34,11 @@ If a question is about a single data point (e.g. "who made the most recent commi
 export const POST = async (request: Request) => {
   const { owner, repo, ...requestData } = await request.json();
 
+  const relta = new ReltaApiClient({
+    owner,
+    repo_name: repo,
+  });
+
   return getEdgeRuntimeResponse({
     options: {
       model,
@@ -46,7 +51,7 @@ export const POST = async (request: Request) => {
             query: z.string().describe("The query to provide the agent."),
           }),
           execute: async (requestData) => {
-            const rows = await getDataQuery(owner, repo, requestData.query);
+            const rows = await relta.getDataQuery(requestData.query);
             const type = await classifyChartType(rows);
             return { type, rows };
           },
@@ -58,7 +63,7 @@ export const POST = async (request: Request) => {
             query: z.string().describe("The query to provide the agent."),
           }),
           execute: async (requestData) => {
-            const text = await getTextQuery(owner, repo, requestData.query);
+            const text = await relta.getTextQuery(requestData.query);
             return text;
           },
         },

@@ -1,4 +1,4 @@
-import { loadGithubData } from "@/lib/reltaApi";
+import { ReltaApiClient } from "@/lib/reltaApi";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 
 export const runtime = "edge";
@@ -18,7 +18,9 @@ export async function POST(request: Request) {
   );
   const accessToken = tokens.data[0].token;
 
-  await loadGithubData(owner, repo, accessToken);
+  await new ReltaApiClient({ owner, repo_name: repo }).loadGithubData(
+    accessToken
+  );
 
   return new Response("Success", { status: 200 });
 }
