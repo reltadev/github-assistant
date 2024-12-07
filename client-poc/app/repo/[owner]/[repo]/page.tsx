@@ -5,6 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LoadingPage } from "./fallback";
 import { FC, Suspense } from "react";
+import { AddRepositoryToList } from "./AddRepositoryToList";
 
 const EnsureRepoIsLoaded: FC<{
   owner: string;
@@ -42,23 +43,26 @@ export default async function Home({
   const { owner, repo } = await params;
 
   return (
-    <Suspense fallback={<LoadingPage owner={owner} repo={repo} />}>
-      <EnsureRepoIsLoaded owner={owner} repo={repo} />
-      <main className="h-dvh flex flex-col">
-        <div className="border-b px-4">
-          <div className="max-w-2xl mx-auto py-6 flex gap-2 items-center">
-            <Link href="/">
-              <ChevronLeft />
-            </Link>
-            <h1 className="text-2xl font-bold">
-              {owner}/{repo}
-            </h1>
+    <>
+      <AddRepositoryToList owner={owner} repo={repo} />
+      <Suspense fallback={<LoadingPage owner={owner} repo={repo} />}>
+        <EnsureRepoIsLoaded owner={owner} repo={repo} />
+        <main className="h-dvh flex flex-col">
+          <div className="border-b px-4">
+            <div className="max-w-2xl mx-auto py-6 flex gap-2 items-center">
+              <Link href="/">
+                <ChevronLeft />
+              </Link>
+              <h1 className="text-2xl font-bold">
+                {owner}/{repo}
+              </h1>
+            </div>
           </div>
-        </div>
-        <div className="flex-grow">
-          <MyAssistant owner={owner} repo={repo} />
-        </div>
-      </main>
-    </Suspense>
+          <div className="flex-grow">
+            <MyAssistant owner={owner} repo={repo} />
+          </div>
+        </main>
+      </Suspense>
+    </>
   );
 }

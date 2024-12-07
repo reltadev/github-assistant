@@ -1,46 +1,72 @@
+"use client";
+
 import { NewRepositoryDialog } from "@/components/NewRepositoryDialog";
+import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
+import { defaultRepos, useRepoStore } from "@/lib/storage";
 import { SignedIn } from "@clerk/nextjs";
 import { SignOutButton } from "@clerk/nextjs";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, TrashIcon } from "lucide-react";
 import Link from "next/link";
 
-const repositories = [
-  {
-    name: "assistant-ui",
-    id: "Yonom/assistant-ui",
-  },
-  { name: "CrewAI", id: "joaomdmoura/crewai" },
-  {
-    name: "LangChain",
-    id: "langchain-ai/langchain",
-  },
-  {
-    name: "LlamaIndex",
-    id: "jerryjliu/llama_index",
-  },
-  {
-    name: "Transformers",
-    id: "huggingface/transformers",
-  },
-  { name: "Whisper", id: "openai/whisper" },
-  { name: "GPT-3", id: "openai/gpt-3" },
-  { name: "DALL-E", id: "openai/DALL-E" },
-  {
-    name: "Stable Diffusion",
-    id: "CompVis/stable-diffusion",
-  },
-  {
-    name: "Anthropic",
-    id: "anthropics/anthropic-ai",
-  },
-  // {
-  //   name: "Midjourney",
-  //   id: "midjourney/midjourney",
-  // },
-];
+interface RepoCardProps {
+  name: string;
+  id: string;
+  href?: string;
+  onDelete?: () => void;
+}
+
+function RepoCard({ name, id, href, onDelete }: RepoCardProps) {
+  const content = (
+    <Card className="aspect-[5/3] hover:bg-muted/20 transition-all hover:shadow-md shadow-none relative">
+      <CardHeader className="h-full pb-4">
+        <h2 className="text-xl font-semibold mb-1 truncate">{name}</h2>
+        <p className="text-sm text-gray-500 truncate">{id}</p>
+        <div className="flex-grow" />
+        {onDelete && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="self-end -mr-2"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onDelete();
+            }}
+          >
+            <TrashIcon />
+          </Button>
+        )}
+      </CardHeader>
+    </Card>
+  );
+
+  return href ? <Link href={href}>{content}</Link> : content;
+}
 
 export default function RepoSelection() {
+  const { repositories: userRepos, deleteRepository } = useRepoStore();
+
+  const renderRepoCards = (
+    repos: { owner: string; repo: string }[],
+    onDelete?: (owner: string, repo: string) => void
+  ) => {
+    return repos.map((repo) => {
+      const id = `${repo.owner}/${repo.repo}`;
+      return (
+        <RepoCard
+          key={id}
+          name={repo.repo}
+          id={id}
+          href={`/repo/${id}`}
+          onDelete={
+            onDelete ? () => onDelete(repo.owner, repo.repo) : undefined
+          }
+        />
+      );
+    });
+  };
+
   return (
     <div className="min-h-dvh flex flex-col">
       <div className="border-b px-4 container mx-auto py-6 flex gap-2 items-center">
@@ -56,24 +82,18 @@ export default function RepoSelection() {
             Which repository do you want to explore?
           </h1>
 
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-            {repositories.map((repo) => (
-              <Link href={`/repo/${repo.id}`} key={repo.id}>
-                <Card className="aspect-[5/3] hover:bg-muted/20 transition-all hover:shadow-md shadow-none">
-                  <CardHeader>
-                    <h2 className="text-xl font-semibold mb-1 truncate">
-                      {repo.name}
-                    </h2>
-                    <p className="text-sm text-gray-500 truncate">{repo.id}</p>
-                  </CardHeader>
-                </Card>
-              </Link>
-            ))}
+          {/* Original 10 repos */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-8">
+            {renderRepoCards(defaultRepos)}
           </div>
 
-          <div className="border-t border-gray-200 my-8"></div>
+          <hr className="my-8 border-gray-200" />
 
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+          {/* User added repos */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-8">
+            {renderRepoCards(userRepos, deleteRepository)}
+
+            {/* Dotted add repo button */}
             <NewRepositoryDialog
               trigger={
                 <Card className="aspect-[5/3] hover:bg-muted/20 transition-all shadow-none border-dashed border-2">
