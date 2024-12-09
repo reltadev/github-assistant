@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/form";
 import { useAuth, useSignIn } from "@clerk/nextjs";
 import { MouseEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const GITHUB_URL_REGEX =
   /^https?:\/\/(?:www\.)?github\.com\/(?<owner>[^\/]+)\/(?<repo>[^\/]+)(?:\/.*)?(?:\.git)?\/?$/;
@@ -48,25 +48,31 @@ export function NewRepositoryDialog({ trigger }: NewRepositoryDialogProps) {
     defaultValues: { githubUrl: "" },
   });
 
+  const searchParams = useSearchParams();
+
   const { signIn } = useSignIn();
   const auth = useAuth();
-  const ensureLogin = async (e: MouseEvent<HTMLButtonElement>) => {
+  const ensureLogin = async (e?: MouseEvent<HTMLButtonElement>) => {
     if (!auth.isLoaded) {
-      e.preventDefault();
-      return;
+      e?.preventDefault();
+      return false;
     }
     if (!auth.isSignedIn) {
-      e.preventDefault();
+      e?.preventDefault();
       await signIn?.authenticateWithRedirect({
         strategy: "oauth_github",
-        redirectUrl: "/",
-        redirectUrlComplete: "/",
+        redirectUrl: "/?open_new=true",
+        redirectUrlComplete: "/?open_new=true",
       });
+      return false;
     }
+    return true;
   };
 
   const router = useRouter();
   const onSubmit = async (data: NewRepoFormData) => {
+    if (!ensureLogin()) return;
+
     const { owner, repo } =
       data.githubUrl.match(GITHUB_URL_REGEX)?.groups ?? {};
     if (!owner || !repo) return;
@@ -82,7 +88,7 @@ export function NewRepositoryDialog({ trigger }: NewRepositoryDialogProps) {
   };
 
   return (
-    <Dialog>
+    <Dialog defaultOpen={!!searchParams.get("open_new")}>
       <DialogTrigger onClick={ensureLogin}>{trigger}</DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
