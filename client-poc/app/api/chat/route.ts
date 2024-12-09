@@ -28,8 +28,11 @@ const getRouterSystemPrompt = (
 Selected Repository: ${repoName}
 
 You can use natural language queries to answer questions the user has about the repository.
+
 If a question is best answered by displaying a graph/chart, use the "chart" tool.
-If a question is about a single data point (e.g. "who made the most recent commit?"), use the "text" tool.`;
+If a question is about a single data point (e.g. "who made the most recent commit?"), use the "text" tool.
+
+When printing a chart, ONLY call the provided function call. This will print the chart to the user. Do not use images.`;
 
 export const POST = async (request: Request) => {
   const { owner, repo, ...requestData } = await request.json();
