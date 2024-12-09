@@ -8,6 +8,7 @@ import { SignedIn } from "@clerk/nextjs";
 import { SignOutButton } from "@clerk/nextjs";
 import { PlusIcon, TrashIcon } from "lucide-react";
 import Link from "next/link";
+import { Suspense } from "react";
 
 interface RepoCardProps {
   name: string;
@@ -94,18 +95,20 @@ export default function RepoSelection() {
             {renderRepoCards(userRepos, deleteRepository)}
 
             {/* Dotted add repo button */}
-            <NewRepositoryDialog
-              trigger={
-                <Card className="aspect-[5/3] hover:bg-muted/20 transition-all shadow-none border-dashed border-2">
-                  <CardHeader className="flex flex-row items-center gap-2">
-                    <PlusIcon className="size-4" />
-                    <h2 className="leading-0 !mt-0 truncate">
-                      Import Repository
-                    </h2>
-                  </CardHeader>
-                </Card>
-              }
-            />
+            <Suspense>
+              <NewRepositoryDialog
+                trigger={
+                  <Card className="aspect-[5/3] hover:bg-muted/20 transition-all shadow-none border-dashed border-2">
+                    <CardHeader className="flex flex-row items-center gap-2">
+                      <PlusIcon className="size-4" />
+                      <h2 className="leading-0 !mt-0 truncate">
+                        Import Repository
+                      </h2>
+                    </CardHeader>
+                  </Card>
+                }
+              />
+            </Suspense>
           </div>
         </div>
       </div>
