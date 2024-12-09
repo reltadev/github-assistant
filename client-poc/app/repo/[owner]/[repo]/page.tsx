@@ -2,7 +2,7 @@ import { MyAssistant } from "@/components/MyAssistant";
 import { ReltaApiClient } from "@/lib/reltaApi";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { LoadingPage } from "./fallback";
 import { FC, Suspense } from "react";
 import { AddRepositoryToList } from "./AddRepositoryToList";
@@ -28,6 +28,9 @@ const EnsureRepoIsLoaded: FC<{
         return null;
       }
 
+      if (info.pipeline_status !== "RUNNING")
+        throw new Error("Pipeline failed");
+
       const age = (Date.now() - startTime) / 1000;
       if (age < maxDuration - 5) {
         await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -37,7 +40,7 @@ const EnsureRepoIsLoaded: FC<{
     }
   } catch (e) {
     console.log(e);
-    // notFound();
+    notFound();
   }
 
   redirect(`/repo/${owner}/${repo}`);
