@@ -53,7 +53,11 @@ export const POST = async (request: Request) => {
           execute: async (requestData) => {
             const rows = await relta.getDataQuery(requestData.query);
             const type = await classifyChartType(rows);
-            return { type, rows };
+            return {
+              type,
+              rows,
+              hint: "The chart is being displayed the user.",
+            };
           },
         },
         text: {
