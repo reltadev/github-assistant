@@ -2,10 +2,12 @@ import { MyAssistant } from "@/components/MyAssistant";
 import { ReltaApiClient } from "@/lib/reltaApi";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { LoadingPage } from "./fallback";
 import { FC, Suspense } from "react";
 import { AddRepositoryToList } from "./AddRepositoryToList";
+
+export const maxDuration = 60;
 
 const EnsureRepoIsLoaded: FC<{
   owner: string;
@@ -16,23 +18,29 @@ const EnsureRepoIsLoaded: FC<{
     repo_name: repo,
   });
   try {
+    const startTime = Date.now();
     while (true) {
       const info = await client.getRepoInfo();
       if (
         info.last_pipeline_run !== null ||
         info.pipeline_status === "SUCCESS"
       ) {
-        break;
+        return null;
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const age = (Date.now() - startTime) / 1000;
+      if (age < maxDuration - 5) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      } else {
+        break;
+      }
     }
   } catch (e) {
     console.log(e);
-    notFound();
+    // notFound();
   }
 
-  return null;
+  redirect(`/repo/${owner}/${repo}`);
 };
 
 export default async function Home({
