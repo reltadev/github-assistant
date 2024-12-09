@@ -8,17 +8,18 @@ export const maxDuration = 30;
 
 const model = openai("gpt-4o");
 
-const classifyChartType = async (rows: object[]) => {
-  const {
-    object: { type },
-  } = await generateObject({
+const generateChartConfig = async (rows: object[]) => {
+  const { object } = await generateObject({
     model,
     system:
       "You are a helpful assistant that answers questions about a GitHub repository. Identify the correct chart type based on the provided data.",
     prompt: JSON.stringify({ rows }),
-    schema: z.object({ type: z.enum(["bar", "line", "pie"]) }),
+    schema: z.object({
+      type: z.enum(["bar", "line", "pie"]),
+      title: z.string(),
+    }),
   });
-  return type;
+  return object;
 };
 
 const getRouterSystemPrompt = (
@@ -55,9 +56,9 @@ export const POST = async (request: Request) => {
           }),
           execute: async (requestData) => {
             const rows = await relta.getDataQuery(requestData.query);
-            const type = await classifyChartType(rows);
+            const config = await generateChartConfig(rows);
             return {
-              type,
+              ...config,
               rows,
               hint: "The chart is being displayed the user.",
             };

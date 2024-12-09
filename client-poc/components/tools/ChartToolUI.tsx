@@ -45,6 +45,7 @@ const getColumns = (data: object[]) => {
 type ChartConfig = {
   rows: object[];
   type: "area" | "bar" | "line";
+  title: string;
 };
 
 const toFirstLetterUpperCase = (str: string) => {
@@ -136,11 +137,7 @@ const MyChart: FC<{ config: ChartConfig }> = ({ config }) => {
           tickLine={false}
           axisLine={false}
         />
-        <YAxis
-          tickMargin={10}
-          tickLine={false}
-          axisLine={false}
-        />
+        <YAxis tickMargin={10} tickLine={false} axisLine={false} />
         <ChartTooltip content={<ChartTooltipContent />} />
         <ChartLegend content={<ChartLegendContent />} />
         {yAxis.map((axis, idx) =>
@@ -156,10 +153,7 @@ const MyChart: FC<{ config: ChartConfig }> = ({ config }) => {
 
 export const ChartToolUI = makeAssistantToolUI<
   Record<string, never>,
-  {
-    type: "area" | "bar" | "line";
-    rows: object[];
-  }
+  ChartConfig
 >({
   toolName: "chart",
   render: ({ result }) => {
@@ -173,7 +167,7 @@ export const ChartToolUI = makeAssistantToolUI<
 
     return (
       <Card>
-        <CardHeader className="py-4 text-center">Chart</CardHeader>
+        <CardHeader className="py-4 text-center">{result.title}</CardHeader>
         <CardContent className="pb-4">
           <MyChart config={result} />
         </CardContent>
