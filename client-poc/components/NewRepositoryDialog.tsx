@@ -61,7 +61,7 @@ export function NewRepositoryDialog({ trigger }: NewRepositoryDialogProps) {
       e?.preventDefault();
       await signIn?.authenticateWithRedirect({
         strategy: "oauth_github",
-        redirectUrl: "/?open_new=true",
+        redirectUrl: "/sso-callback",
         redirectUrlComplete: "/?open_new=true",
       });
       return false;
