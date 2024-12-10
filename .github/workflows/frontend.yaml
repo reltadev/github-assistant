@@ -27,12 +27,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: "pnpm"
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
       - name: Install dependencies
-        run: npm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
