@@ -84,13 +84,13 @@ def _create_relta_source_and_deploy_semantic_layer(owner: str, repo_name: str) -
         # Build list of semantic layer paths based on successfully loaded data types
         metrics_to_load = []
         if repo.loaded_commits:
-            metrics_to_load.extend(['commits_details', 'commits_total', 'commits_by_author', 'commits_by_day', 'commits_by_author'])
+            metrics_to_load.extend(['commit_activity'])
         if repo.loaded_issues:
-            metrics_to_load.append('issue_metrics')
+            metrics_to_load.append('issue_tracking')
         if repo.loaded_pull_requests:
-            metrics_to_load.append('pr_metrics')
+            metrics_to_load.append('pull_request_status')
         if repo.loaded_stars:
-            metrics_to_load.append('stargazer_metrics')
+            metrics_to_load.append('repository_stars')
 
         source = server_state.client.get_or_create_datasource(
             connection_uri=f"{server_state.database_uri}/{repo.source_name()}",
@@ -332,6 +332,7 @@ def background_pipeline_run(repo_id: int, access_token: str, **load_options):
             repo.load_data(access_token, **load_options)
             # Commit the changes
             repo.pipeline_status = PipelineStatus.SUCCESS
+            repo.last_pipeline_run = datetime.now()
             session.add(repo)
             session.commit()
                  

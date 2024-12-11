@@ -1,0 +1,53 @@
+{
+  "name": "pull_request_status",
+  "description": "Tracks the status of pull requests, including who created them, their open status, and duration.",
+  "datasource": "github-info",
+  "dimensions": [
+    {
+      "name": "number",
+      "description": "The unique number identifying the pull request.",
+      "categories": null,
+      "skip_categorical_load": false,
+      "dtype": "BIGINT"
+    },
+    {
+      "name": "author__login",
+      "description": "The login of the user who created the pull request.",
+      "categories": null,
+      "skip_categorical_load": false,
+      "dtype": "VARCHAR"
+    },
+    {
+      "name": "created_at",
+      "description": "The timestamp when the pull request was created.",
+      "categories": null,
+      "skip_categorical_load": false,
+      "dtype": "TIMESTAMP WITH TIME ZONE"
+    },
+    {
+      "name": "closed",
+      "description": "Indicates whether the pull request is closed.",
+      "categories": null,
+      "skip_categorical_load": false,
+      "dtype": "BOOLEAN"
+    }
+  ],
+  "measures": [
+    {
+      "name": "open_pr_count",
+      "description": "The number of open pull requests.",
+      "expr": "SUM(CASE WHEN closed = FALSE THEN 1 ELSE 0 END)"
+    },
+    {
+      "name": "average_open_duration",
+      "description": "The average duration pull requests remain open.",
+      "expr": "AVG(EXTRACT(EPOCH FROM (COALESCE(closed_at, NOW()) - created_at)))"
+    }
+  ],
+  "sample_questions": [
+    "How many open PRs are there?",
+    "How long does the average PR stay open?",
+    "Who created the last open PR?"
+  ],
+  "sql_to_underlying_datasource": "SELECT number, author__login, created_at, closed, closed_at FROM pull_requests.pull_requests"
+}

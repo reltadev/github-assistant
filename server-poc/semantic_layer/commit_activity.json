@@ -1,0 +1,60 @@
+{
+  "name": "commit_activity",
+  "description": "Tracks the number of commits, who made them, and details about the changes in the commits.",
+  "datasource": "github-info",
+  "dimensions": [
+    {
+      "name": "committed_date",
+      "description": "The timestamp when the commit was made.",
+      "categories": null,
+      "skip_categorical_load": false,
+      "dtype": "TIMESTAMP WITH TIME ZONE"
+    },
+    {
+      "name": "author__user__login",
+      "description": "The login of the user who made the commit.",
+      "categories": null,
+      "skip_categorical_load": false,
+      "dtype": "VARCHAR"
+    },
+    {
+      "name": "additions",
+      "description": "The number of lines added in the commit.",
+      "categories": null,
+      "skip_categorical_load": false,
+      "dtype": "BIGINT"
+    },
+    {
+      "name": "deletions",
+      "description": "The number of lines deleted in the commit.",
+      "categories": null,
+      "skip_categorical_load": false,
+      "dtype": "BIGINT"
+    },
+    {
+      "name": "changed_files",
+      "description": "The number of files changed in the commit.",
+      "categories": null,
+      "skip_categorical_load": false,
+      "dtype": "BIGINT"
+    }
+  ],
+  "measures": [
+    {
+      "name": "total_commits",
+      "description": "The total number of commits made.",
+      "expr": "COUNT(*)"
+    },
+    {
+      "name": "max_lines_changed",
+      "description": "The maximum number of lines changed in a single commit.",
+      "expr": "MAX(additions + deletions)"
+    }
+  ],
+  "sample_questions": [
+    "How many commits have been made on the repo?",
+    "Who has made the most commits?",
+    "Which commit had the most lines of code changed?"
+  ],
+  "sql_to_underlying_datasource": "SELECT committed_date, author__user__login, additions, deletions, changed_files FROM commits.commits"
+}

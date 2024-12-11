@@ -1,0 +1,164 @@
+[
+    {
+        "question": "How many stars does the repository have?",
+        "golden_sql": "SELECT COUNT(*) as star_count FROM stargazers",
+        "description": "Basic count of repository stars",
+        "tags": ["stars", "basic"]
+    },
+    {
+        "question": "What is the total number of commits in the last month?",
+        "golden_sql": "SELECT COUNT(*) as commit_count FROM commits WHERE created_at >= NOW() - INTERVAL '1 month'",
+        "description": "Count of recent commits",
+        "tags": ["commits", "temporal"]
+    },
+    {
+        "question": "Who are the top 5 contributors by commit count?",
+        "golden_sql": "SELECT author_name, COUNT(*) as commit_count FROM commits GROUP BY author_name ORDER BY commit_count DESC LIMIT 5",
+        "description": "Top contributors ranking",
+        "tags": ["commits", "authors", "ranking"]
+    },
+    {
+        "question": "how many open PRs does the repo have",
+        "golden_sql": "",
+        "description": "Count of open pull requests",
+        "tags": ["prs", "basic"]
+    },
+    {
+        "question": "who created the last one?",
+        "golden_sql": "",
+        "description": "Author of most recent PR",
+        "tags": ["prs", "authors"]
+    },
+    {
+        "question": "Show the number of stars per week for the repository Yonom/assistant-ui",
+        "golden_sql": "",
+        "description": "Weekly star count aggregation",
+        "tags": ["stars", "temporal", "aggregation"]
+    },
+    {
+        "question": "Show a chart of stars received per day for the Yonom/assistant-ui repository",
+        "golden_sql": "",
+        "description": "Daily star count aggregation",
+        "tags": ["stars", "temporal", "aggregation"]
+    },
+    {
+        "question": "Show the accumulation of stars per day over time for the repository Yonom/assistant-ui",
+        "golden_sql": "",
+        "description": "Cumulative star count over time",
+        "tags": ["stars", "temporal", "cumulative"]
+    },
+    {
+        "question": "Who gave the first star, last star?",
+        "golden_sql": "",
+        "description": "First and last stargazers",
+        "tags": ["stars", "users", "temporal"]
+    },
+    {
+        "question": "What gave stars in November?",
+        "golden_sql": "",
+        "description": "Stars in specific month",
+        "tags": ["stars", "temporal", "filtering"]
+    },
+    {
+        "question": "What day were the most stars given?",
+        "golden_sql": "",
+        "description": "Peak star day",
+        "tags": ["stars", "temporal", "aggregation"]
+    },
+    {
+        "question": "What days of the week were most stars given?",
+        "golden_sql": "",
+        "description": "Star distribution by day of week",
+        "tags": ["stars", "temporal", "aggregation"]
+    },
+    {
+        "question": "How many PRs were created by the repo owners vs contributors?",
+        "golden_sql": "",
+        "description": "PR author type distribution",
+        "tags": ["prs", "authors", "comparison"]
+    },
+    {
+        "question": "How long does the average PR stay open?",
+        "golden_sql": "",
+        "description": "Average PR duration",
+        "tags": ["prs", "temporal", "metrics"]
+    },
+    {
+        "question": "What was the longest open PR? How long was it open?",
+        "golden_sql": "",
+        "description": "Longest PR duration",
+        "tags": ["prs", "temporal", "metrics"]
+    },
+    {
+        "question": "How many comments did PR 869 have?",
+        "golden_sql": "",
+        "description": "PR comment count",
+        "tags": ["prs", "comments", "specific"]
+    },
+    {
+        "question": "How many issues have been created on the repo?",
+        "golden_sql": "",
+        "description": "Total issue count",
+        "tags": ["issues", "basic"]
+    },
+    {
+        "question": "Which user has created the most issues so far?",
+        "golden_sql": "",
+        "description": "Top issue creator",
+        "tags": ["issues", "authors", "ranking"]
+    },
+    {
+        "question": "How long does it take on average for an issue to be closed?",
+        "golden_sql": "",
+        "description": "Average issue resolution time",
+        "tags": ["issues", "temporal", "metrics"]
+    },
+    {
+        "question": "How many open issues are there?",
+        "golden_sql": "",
+        "description": "Open issue count",
+        "tags": ["issues", "basic"]
+    },
+    {
+        "question": "What is the title and description of issue number 1226?",
+        "golden_sql": "",
+        "description": "Specific issue details",
+        "tags": ["issues", "content", "specific"]
+    },
+    {
+        "question": "How many commits have been made on the repo?",
+        "golden_sql": "",
+        "description": "Total commit count",
+        "tags": ["commits", "basic"]
+    },
+    {
+        "question": "Number of commits made by week",
+        "golden_sql": "",
+        "description": "Weekly commit aggregation",
+        "tags": ["commits", "temporal", "aggregation"]
+    },
+    {
+        "question": "Number of commits made by day",
+        "golden_sql": "",
+        "description": "Daily commit aggregation",
+        "tags": ["commits", "temporal", "aggregation"]
+    },
+    {
+        "question": "Who has made the most commits?",
+        "golden_sql": "",
+        "description": "Top committer",
+        "tags": ["commits", "authors", "ranking"]
+    },
+    {
+        "question": "Which commit had the most lines of code changed?",
+        "golden_sql": "",
+        "description": "Largest commit by lines changed",
+        "tags": ["commits", "metrics", "ranking"]
+    },
+    {
+        "question": "Which commits had the most changed files?",
+        "golden_sql": "",
+        "description": "Commits ranked by file changes",
+        "tags": ["commits", "metrics", "ranking"]
+    }
+]
