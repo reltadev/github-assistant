@@ -6,6 +6,7 @@ import { notFound, redirect } from "next/navigation";
 import { LoadingPage } from "./fallback";
 import { FC, Suspense } from "react";
 import { AddRepositoryToList } from "./AddRepositoryToList";
+import { RepositoryInfo } from "./RepositoryInfo";
 
 export const maxDuration = 60;
 
@@ -67,6 +68,10 @@ export default async function Home({
               <h1 className="text-2xl font-bold">
                 {owner}/{repo}
               </h1>
+              <div className="flex-grow" />
+              <Suspense>
+                <RepositoryInfo owner={owner} repo={repo} />
+              </Suspense>
             </div>
           </div>
           <div className="flex-grow">
