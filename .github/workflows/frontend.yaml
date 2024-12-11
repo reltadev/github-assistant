@@ -26,11 +26,12 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9.15.0
+          package_json_file: client-poc/package.json
 
       - name: Setup node.js
         uses: actions/setup-node@v4
         with:
+          cache-dependency-path: client-poc/pnpm-lock.yaml
           node-version: 20
           cache: "pnpm"
 
