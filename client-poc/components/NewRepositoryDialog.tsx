@@ -95,7 +95,7 @@ export function NewRepositoryDialog({ trigger }: NewRepositoryDialogProps) {
           <DialogTitle>New Repository</DialogTitle>
           <DialogDescription>
             Add a new repository. We might ask you to sign in to GitHub to
-            proceed.
+            proceed. Only PUBLIC repositories are supported.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
