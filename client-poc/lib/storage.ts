@@ -3,15 +3,15 @@ import { persist } from "zustand/middleware";
 
 export const defaultRepos = [
   { owner: "Yonom", repo: "assistant-ui" },
-  { owner: "joaomdmoura", repo: "crewai" },
   { owner: "langchain-ai", repo: "langchain" },
-  { owner: "jerryjliu", repo: "llama_index" },
-  { owner: "huggingface", repo: "transformers" },
   { owner: "openai", repo: "whisper" },
-  { owner: "openai", repo: "gpt-3" },
-  { owner: "openai", repo: "DALL-E" },
-  { owner: "CompVis", repo: "stable-diffusion" },
-  { owner: "anthropics", repo: "anthropic-ai" },
+  // { owner: "joaomdmoura", repo: "crewai" },
+  // { owner: "jerryjliu", repo: "llama_index" },
+  // { owner: "huggingface", repo: "transformers" },
+  // { owner: "openai", repo: "gpt-3" },
+  // { owner: "openai", repo: "DALL-E" },
+  // { owner: "CompVis", repo: "stable-diffusion" },
+  // { owner: "anthropics", repo: "anthropic-ai" },
 ];
 
 type Repository = {
