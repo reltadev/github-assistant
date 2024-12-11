@@ -13,7 +13,7 @@ export type RepoInfo = {
   loaded_issues: boolean;
   loaded_stars: boolean;
   repo_name: string;
-  pipeline_status: "SUCCESS" | "RUNNING";
+  pipeline_status: "SUCCESS" | "RUNNING" | "FAILED";
   loaded_pull_requests: boolean;
   loaded_commits: boolean;
 };
