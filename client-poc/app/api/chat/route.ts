@@ -60,7 +60,10 @@ export const POST = async (request: Request) => {
             return {
               ...config,
               rows,
-              hint: "The chart is being displayed the user.",
+              hint:
+                rows.length > 0
+                  ? "The chart is being displayed the user."
+                  : "No data available.",
             };
           },
         },
