@@ -1,0 +1,34 @@
+{
+  "name": "repository_stars",
+  "description": "Tracks the number of stars a github repository has received over time, including details about who starred the repository and when.",
+  "datasource": "github-info",
+  "dimensions": [
+    {
+      "name": "starred_at",
+      "description": "The timestamp when the repository was starred.",
+      "categories": null,
+      "skip_categorical_load": false,
+      "dtype": "TIMESTAMP WITH TIME ZONE"
+    },
+    {
+      "name": "user__login",
+      "description": "The login of the user who starred the repository.",
+      "categories": null,
+      "skip_categorical_load": false,
+      "dtype": "VARCHAR"
+    }
+  ],
+  "measures": [
+    {
+      "name": "total_stars",
+      "description": "The total number of stars the repository has received.",
+      "expr": "COUNT(*)"
+    }
+  ],
+  "sample_questions": [
+    "How many stars does the repo have?",
+    "Show the number of stars per week for the repository Yonom/assistant-ui.",
+    "Who gave the first star and last star?"
+  ],
+  "sql_to_underlying_datasource": "SELECT starred_at, user__login FROM stargazers.stargazers"
+}

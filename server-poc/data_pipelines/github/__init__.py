@@ -7,7 +7,7 @@ import dlt
 from dlt.common.typing import TDataItems
 from dlt.sources import DltResource
 
-from .helpers import get_reactions_data, get_rest_pages, get_stargazers
+from .helpers import get_reactions_data, get_rest_pages, get_stargazers, get_commits
 
 
 @dlt.source
@@ -144,6 +144,45 @@ def github_stargazers(
                 max_items,
             ),
             name="stargazers",
+            write_disposition="replace",
+        ),
+    )
+
+
+@dlt.source
+def github_commits(
+    owner: str,
+    name: str,
+    access_token: str = dlt.secrets.value,
+    items_per_page: int = 100,
+    max_items: Optional[int] = None,
+) -> Sequence[DltResource]:
+    """Get commits in the repo `name` with owner `owner`.
+
+    This source uses graphql to retrieve all commits with their associated data.
+    Internally graphql is used to retrieve data. It is cost optimized and you are able to retrieve the
+    data for fairly large repos quickly and cheaply.
+
+    Args:
+        owner (str): The repository owner
+        name (str): The repository name
+        access_token (str): The classic access token. Will be injected from secrets if not provided.
+        items_per_page (int, optional): How many commits to get in single page. Defaults to 100.
+        max_items (int, optional): How many commits to get in total. None means All.
+
+    Returns:
+        Sequence[DltResource]: One DltResource: `commits`
+    """
+    return (
+        dlt.resource(
+            get_commits(
+                owner,
+                name,
+                access_token,
+                items_per_page,
+                max_items,
+            ),
+            name="commits",
             write_disposition="replace",
         ),
     )

@@ -1,0 +1,3 @@
+.relta/data/*
+.relta/relta_internal.duckdb
+.relta/relta_data.duckdb

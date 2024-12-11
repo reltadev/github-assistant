@@ -1,0 +1,66 @@
+{
+  "name": "issue_tracking",
+  "description": "Tracks the number of issues, who created them, and their open status.",
+  "datasource": "github-info",
+  "dimensions": [
+    {
+      "name": "url",
+      "description": "Link to the issue",
+      "categories": null,
+      "dtype": "VARCHAR",
+      "skip_categorical_load": true
+    },
+    {
+      "name": "title",
+      "description": "The title of the issue.",
+      "categories": null,
+      "dtype": "VARCHAR"
+    },
+    {
+      "name": "number",
+      "description": "The unique number identifying the issue.",
+      "categories": null,
+      "skip_categorical_load": true,
+      "dtype": "BIGINT"
+    },
+    {
+      "name": "author__login",
+      "description": "The login of the user who created the issue.",
+      "categories": null,
+      "skip_categorical_load": false,
+      "dtype": "VARCHAR"
+    },
+    {
+      "name": "created_at",
+      "description": "The timestamp when the issue was created.",
+      "categories": null,
+      "skip_categorical_load": false,
+      "dtype": "TIMESTAMP WITH TIME ZONE"
+    },
+    {
+      "name": "closed",
+      "description": "Indicates whether the issue is closed.",
+      "categories": null,
+      "skip_categorical_load": false,
+      "dtype": "BOOLEAN"
+    }
+  ],
+  "measures": [
+    {
+      "name": "open_issue_count",
+      "description": "The number of open issues.",
+      "expr": "SUM(CASE WHEN closed = FALSE THEN 1 ELSE 0 END)"
+    },
+    {
+      "name": "average_closure_time",
+      "description": "The average time it takes for an issue to be closed.",
+      "expr": "AVG(EXTRACT(EPOCH FROM (COALESCE(closed_at, NOW()) - created_at)))"
+    }
+  ],
+  "sample_questions": [
+    "How many open issues are there?",
+    "Which user has created the most issues so far?",
+    "How long does it take on average for an issue to be closed?"
+  ],
+  "sql_to_underlying_datasource": "SELECT number, author__login, created_at, closed, closed_at, title, url FROM issues.issues"
+}

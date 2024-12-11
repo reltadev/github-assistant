@@ -93,11 +93,14 @@ resource "aws_iam_policy" "ecs_execution_policy" {
           "elasticloadbalancing:*",
           "cloudwatch:*",
           "logs:*",
-          "s3:GetObject"
+          "s3:GetObject",
+          "rds-db:connect",
+          "secretsmanager:GetSecretValue"
         ],
         Resource : [
           "*",
-          "arn:aws:s3:::github-assistant-env/.env"
+          "arn:aws:s3:::github-assistant-env/.env",
+          # aws_secretsmanager_secret.rds_credentials.arn
         ]
       }
     ]

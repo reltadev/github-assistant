@@ -1,14 +1,11 @@
 import dlt
+from .github import github_reactions, github_stargazers, github_commits
 
-from .github import github_reactions, github_stargazers
-
-DEFAULT_DIR='data'
-
-def load_issues_data(owner: str, repo: str, destination_dir: str = DEFAULT_DIR, access_token: str | None = None) -> None:
+def load_issues_data(owner: str, repo: str, destination: str, access_token: str | None = None) -> None:
     """Loads all issues and their reactions for the specified repo"""
     pipeline = dlt.pipeline(
-        "github_issues",
-        destination=dlt.destinations.duckdb(f"{destination_dir}/{repo}_github_data.duckdb"),
+        f"{owner.lower()}_{repo.lower()}_github_issues",
+        destination=dlt.destinations.postgres(destination),
         dataset_name="issues"
     )
 
@@ -24,11 +21,12 @@ def load_issues_data(owner: str, repo: str, destination_dir: str = DEFAULT_DIR, 
     load_info = pipeline.run(data, table_name="issues")
     print(f"Loaded issues:{load_info}", load_info)
 
-def load_pull_requests_data(owner: str, repo: str, destination_dir: str = DEFAULT_DIR, access_token: str | None = None) -> None:
+def load_pull_requests_data(owner: str, repo: str, destination: str, access_token: str | None = None) -> None:
     """Loads all pull requests and their reactions for the specified repo"""
+    print(destination)
     pipeline = dlt.pipeline(
-        "github_prs",
-        destination=dlt.destinations.duckdb(f"{destination_dir}/{repo}_github_data.duckdb"),
+         f"{owner.lower()}_{repo.lower()}_github_prs",
+        destination=dlt.destinations.postgres(destination),
         dataset_name="pull_requests"
     )
 
@@ -44,16 +42,35 @@ def load_pull_requests_data(owner: str, repo: str, destination_dir: str = DEFAUL
     load_info = pipeline.run(data, table_name="pull_requests")
     print(f"Loaded pull requests:{load_info}")
 
-def load_stargazer_data(owner:str, repo:str, destination_dir: str = DEFAULT_DIR, access_token:str | None = None) -> None:
+def load_stargazer_data(owner:str, repo:str, destination: str, access_token:str | None = None) -> None:
     """Loads all stargazers for dlthub dlt repo"""
-    
     pipeline = dlt.pipeline(
-        "github_stargazers",
-        destination=dlt.destinations.duckdb(f"{destination_dir}/{repo}_github_data.duckdb"),
+        f"{owner.lower()}_{repo.lower()}_github_stargazers",
+        destination=dlt.destinations.postgres(destination),
         dataset_name="stargazers"
     )
     data = github_stargazers(owner, repo, access_token= access_token)
     print(pipeline.run(data))
+
+def load_commit_data(owner: str, repo: str, destination: str, access_token: str | None = None) -> None:
+    """Loads all commits for the specified repo"""
+    pipeline = dlt.pipeline(
+        f"{owner.lower()}_{repo.lower()}_github_commits",
+        destination=dlt.destinations.postgres(destination),
+        dataset_name="commits"
+    )
+
+    # Initialize the data source with the specified parameters
+    data = github_commits(
+        owner=owner,
+        name=repo,
+        access_token=access_token,
+        items_per_page=100
+    )
+    
+    # Run the pipeline and print the outcome
+    load_info = pipeline.run(data)
+    print(f"Loaded commits: {load_info}")
 
 
 

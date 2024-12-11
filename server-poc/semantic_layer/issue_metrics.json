@@ -1,0 +1,82 @@
+{
+  "name": "issue_metrics",
+  "description": "Metrics related to issues in the GitHub repository, including counts, user interactions, and time-based metrics.",
+  "datasource": "yonom_assistantui",
+  "dimensions": [
+    {
+      "name": "issue_number",
+      "description": "The unique number identifying an issue.",
+      "categories": null,
+      "dtype": "BIGINT"
+    },
+    {
+      "name": "issue_title",
+      "description": "The title of the issue.",
+      "categories": null,
+      "dtype": "VARCHAR"
+    },
+    {
+      "name": "issue_body",
+      "description": "The body or description of the issue.",
+      "categories": null,
+      "dtype": "VARCHAR"
+    },
+    {
+      "name": "issue_author_login",
+      "description": "The login of the user who created the issue.",
+      "categories": null,
+      "dtype": "VARCHAR"
+    },
+    {
+      "name": "issue_created_at",
+      "description": "The timestamp when the issue was created.",
+      "categories": null,
+      "dtype": "TIMESTAMP WITH TIME ZONE"
+    },
+    {
+      "name": "issue_closed_at",
+      "description": "The timestamp when the issue was closed, if applicable.",
+      "categories": null,
+      "dtype": "TIMESTAMP WITH TIME ZONE"
+    },
+    {
+      "name": "issue_state",
+      "description": "The current state of the issue (e.g., open, closed).",
+      "categories": [
+        "OPEN",
+        "CLOSED"
+      ],
+      "dtype": "VARCHAR"
+    }
+  ],
+  "measures": [
+    {
+      "name": "total_issues",
+      "description": "The total number of issues created.",
+      "expr": "COUNT(issue_number)"
+    },
+    {
+      "name": "average_time_to_close_issue",
+      "description": "The average time taken to close an issue.",
+      "expr": "AVG(EXTRACT(EPOCH FROM (issue_closed_at - issue_created_at)))"
+    },
+    {
+      "name": "open_issues",
+      "description": "The number of issues that are currently open.",
+      "expr": "SUM(CASE WHEN issue_state = 'OPEN' THEN 1 ELSE 0 END)"
+    },
+    {
+      "name": "most_issues_by_user",
+      "description": "The user who has created the most issues.",
+      "expr": "MAX(issue_author_login)"
+    }
+  ],
+  "sample_questions": [
+    "How many issues have been created on the repo?",
+    "Which user has created the most issues so far?",
+    "How long does it take on average for an issue to be closed?",
+    "How many open issues are there?",
+    "What is the title and description of issue number 1226?"
+  ],
+  "sql_to_underlying_datasource": "SELECT number AS issue_number, title AS issue_title, body AS issue_body, author__login AS issue_author_login, created_at AS issue_created_at, closed_at AS issue_closed_at, state AS issue_state FROM issues.issues"
+}

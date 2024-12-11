@@ -33,8 +33,22 @@ module "ecs" {
   depends_on         = [module.network]
 }
 
+module "rds" {
+  source                = "./rds"
+  app_name             = var.app_name
+  vpc_id               = module.network.vpc.id
+  private_subnet_ids   = [for s in module.network.private_subnets : s.id]
+  ecs_security_group_id = module.ecs.ecs_security_group_id
+  db_username         = var.db_username
+  db_password         = var.db_password
+  depends_on           = [module.network]
+}
 
 # Outputs
 output "alb_dns_name" {
   value = module.ecs.alb_dns_name
+}
+
+output "rds_endpoint" {
+  value = module.rds.rds_endpoint
 }

@@ -1,0 +1,30 @@
+{
+  "name": "commit_details",
+  "description": "Details about commits including lines of code changed and files changed.",
+  "datasource": "dataherald_dataherald",
+  "dimensions": [
+    {
+      "name": "oid",
+      "description": "The unique identifier for each commit.",
+      "categories": null,
+      "dtype": "VARCHAR"
+    }
+  ],
+  "measures": [
+    {
+      "name": "max_lines_changed",
+      "description": "The maximum number of lines of code changed in a single commit.",
+      "expr": "MAX(additions + deletions)"
+    },
+    {
+      "name": "max_files_changed",
+      "description": "The maximum number of files changed in a single commit.",
+      "expr": "MAX(changed_files)"
+    }
+  ],
+  "sample_questions": [
+    "Which commit had the most lines of code changed?",
+    "Which commits had the most changed files?"
+  ],
+  "sql_to_underlying_datasource": "SELECT oid, additions, deletions, changed_files FROM commits.commits"
+}
