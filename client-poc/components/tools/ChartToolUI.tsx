@@ -80,7 +80,7 @@ const AreaSeries: FC<SeriesProps> = ({ dataKey, fill }) => {
     <Area
       key={dataKey}
       dataKey={dataKey}
-      type="natural"
+      type="linear"
       fill={fill}
       fillOpacity={0.4}
       stroke={fill}
@@ -93,7 +93,7 @@ const LineSeries: FC<SeriesProps> = ({ dataKey, fill }) => {
     <Line
       key={dataKey}
       dataKey={dataKey}
-      type="natural"
+      type="linear"
       stroke={fill}
       strokeWidth={2}
       dot={false}
@@ -115,6 +115,14 @@ const getChartSeries = (type: "area" | "bar" | "line") => {
   }
 };
 
+const formatXAxis = (tick: string) => {
+  const date = new Date(tick);
+  if (date.toString() !== "Invalid Date") {
+    return date.toISOString().split("T")[0]; // This will return YYYY-MM-DD
+  }
+  return tick;
+};
+
 const MyChart: FC<{ config: ChartConfig }> = ({ config }) => {
   const columns = getColumns(config.rows);
   if (!columns) return null;
@@ -133,6 +141,7 @@ const MyChart: FC<{ config: ChartConfig }> = ({ config }) => {
         <CartesianGrid vertical={false} />
         <XAxis
           dataKey={xAxis}
+          tickFormatter={(tick) => formatXAxis(tick)}
           tickMargin={10}
           tickLine={false}
           axisLine={false}
@@ -162,6 +171,14 @@ export const ChartToolUI = makeAssistantToolUI<
         <div className="flex items-center gap-1 animate-pulse">
           <MousePointerClickIcon className="size-4" />
           <span>Querying Relta...</span>
+        </div>
+      );
+
+    if (!result.rows.length)
+      return (
+        <div className="flex items-center gap-1">
+          <MousePointerClickIcon className="size-4" />
+          <span>Queried Relta</span>
         </div>
       );
 
