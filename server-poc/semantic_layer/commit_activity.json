@@ -5,7 +5,7 @@
   "dimensions": [
     {
       "name": "committed_date",
-      "description": "The timestamp when the commit was made.",
+      "description": "The timestamp when the commit was made. If the questions is for a value over time without specifying time granularity, return daily values",
       "categories": null,
       "skip_categorical_load": false,
       "dtype": "TIMESTAMP WITH TIME ZONE"
@@ -54,7 +54,8 @@
   "sample_questions": [
     "How many commits have been made on the repo?",
     "Who has made the most commits?",
-    "Which commit had the most lines of code changed?"
+    "Which commit had the most lines of code changed?",
+    "give me information about the last xxx commits"
   ],
   "sql_to_underlying_datasource": "SELECT committed_date, author__user__login, additions, deletions, changed_files FROM commits.commits"
 }

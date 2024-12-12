@@ -19,7 +19,7 @@
     },
     {
       "name": "created_at",
-      "description": "The timestamp when the pull request was created.",
+      "description": "The timestamp when the pull request was created. If the questions is for a value over time without specifying time granularity, return daily values",
       "categories": null,
       "skip_categorical_load": false,
       "dtype": "TIMESTAMP WITH TIME ZONE"

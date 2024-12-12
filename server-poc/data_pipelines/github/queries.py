@@ -8,7 +8,7 @@ RATE_LIMIT = """
 """
 
 ISSUES_QUERY = """
-query($owner: String!, $name: String!, $issues_per_page: Int!, $first_reactions: Int!, $first_comments: Int!, $page_after: String) {
+query($owner: String!, $name: String!, $issues_per_page: Int!,   $first_comments: Int!, $page_after: String) {
   repository(owner: $owner, name: $name) {
     %s(first: $issues_per_page, orderBy: {field: CREATED_AT, direction: DESC}, after: $page_after) {
       totalCount
@@ -29,15 +29,15 @@ query($owner: String!, $name: String!, $issues_per_page: Int!, $first_reactions:
         createdAt
         state
         updatedAt
-        reactions(first: $first_reactions) {
-          totalCount
-          nodes {
-            # id
-            user {login avatarUrl url}
-            content
-            createdAt
-          }
-        }
+        # reactions(first: $first_reactions) {
+        #   totalCount
+        #   nodes {
+        #     # id
+        #     user {login avatarUrl url}
+        #     content
+        #     createdAt
+        #   }
+        # }
         comments(first: $first_comments) {
           totalCount
           nodes {

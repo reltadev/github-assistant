@@ -32,7 +32,7 @@
     },
     {
       "name": "created_at",
-      "description": "The timestamp when the issue was created.",
+      "description": "The timestamp when the issue was created. If the question is for a value over time without specifying time granularity, return daily values",
       "categories": null,
       "skip_categorical_load": false,
       "dtype": "TIMESTAMP WITH TIME ZONE"
@@ -60,7 +60,8 @@
   "sample_questions": [
     "How many open issues are there?",
     "Which user has created the most issues so far?",
-    "How long does it take on average for an issue to be closed?"
+    "How long does it take on average for an issue to be closed?",
+    "what are the last xxx issues created?"
   ],
   "sql_to_underlying_datasource": "SELECT number, author__login, created_at, closed, closed_at, title, url FROM issues.issues"
 }

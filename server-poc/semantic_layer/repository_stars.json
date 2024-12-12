@@ -1,18 +1,18 @@
 {
   "name": "repository_stars",
-  "description": "Tracks the number of stars a github repository has received over time, including details about who starred the repository and when.",
+  "description": "Tracks the number of stars of a github repository has received over time, including details about who starred the repository and when.",
   "datasource": "github-info",
   "dimensions": [
     {
       "name": "starred_at",
-      "description": "The timestamp when the repository was starred.",
+      "description": "The timestamp when the repository was starred. If the questions is for a value over time without specifying time granularity, return daily values",
       "categories": null,
       "skip_categorical_load": false,
       "dtype": "TIMESTAMP WITH TIME ZONE"
     },
     {
       "name": "user__login",
-      "description": "The login of the user who starred the repository.",
+      "description": "The login of the user who gave the star to this repository.",
       "categories": null,
       "skip_categorical_load": false,
       "dtype": "VARCHAR"

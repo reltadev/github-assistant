@@ -99,6 +99,10 @@ def _create_relta_source_and_deploy_semantic_layer(owner: str, repo_name: str) -
 
        
         source.semantic_layer.load(path='semantic_layer/', metrics_to_load=metrics_to_load)
+
+        ##this is a hack so LLM knows all the data is for the given repo
+        for metric in source.semantic_layer.metrics:
+            metric.description = f"{metric.description} All data is from the {owner}/{repo_name} GitHub repository."  
         source.deploy()
 
         return source
