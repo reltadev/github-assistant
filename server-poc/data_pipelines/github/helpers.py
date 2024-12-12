@@ -13,7 +13,7 @@ from .settings import GRAPHQL_API_BASE_URL, REST_API_BASE_URL
 #
 def _get_auth_header(access_token: Optional[str]) -> StrAny:
     if access_token:
-        return {"Authorization": f"Bearer {access_token}"}
+        return {"Authorization": f"Bearer {access_token}", "User-Agent":"request"}
     else:
         # REST API works without access token (with high rate limits)
         return {}
@@ -92,13 +92,13 @@ def get_reactions_data(
                 comment.pop("reactionGroups", None)
 
         # get comment reactions by querying comment nodes separately
-        comment_reactions = _get_comment_reaction(
+        """comment_reactions = _get_comment_reaction(
             list(reacted_comment_ids.keys()), access_token
         )
         # attach the reaction nodes where they should be
         for comment in comment_reactions.values():
             comment_id = comment["id"]
-            reacted_comment_ids[comment_id]["reactions"] = comment["reactions"]
+            reacted_comment_ids[comment_id]["reactions"] = comment["reactions"]"""
         yield map(_extract_nested_nodes, page_items)
 
 
@@ -139,14 +139,14 @@ def _extract_top_connection(data: StrAny, node_type: str) -> StrAny:
 
 def _extract_nested_nodes(item: DictStrAny) -> DictStrAny:
     """Recursively moves `nodes` and `totalCount` to reduce nesting."""
-    item["reactions_totalCount"] = item["reactions"].get("totalCount", 0)
-    item["reactions"] = item["reactions"]["nodes"]
+    #item["reactions_totalCount"] = item["reactions"].get("totalCount", 0)
+    #item["reactions"] = item["reactions"]["nodes"]
     comments = item["comments"]
     item["comments_totalCount"] = item["comments"].get("totalCount", 0)
-    for comment in comments["nodes"]:
+    """for comment in comments["nodes"]:
         if "reactions" in comment:
             comment["reactions_totalCount"] = comment["reactions"].get("totalCount", 0)
-            comment["reactions"] = comment["reactions"]["nodes"]
+            comment["reactions"] = comment["reactions"]["nodes"]"""
     item["comments"] = comments["nodes"]
     return item
 
@@ -155,13 +155,34 @@ def _run_graphql_query(
     access_token: str, query: str, variables: DictStrAny
 ) -> Tuple[StrAny, StrAny]:
     def _request() -> requests.Response:
-        r = requests.post(
-            GRAPHQL_API_BASE_URL,
-            json={"query": query, "variables": variables},
-            headers=_get_auth_header(access_token),
-        )
-        return r
+        while True:
+            try:
+                r = requests.post(
+                    GRAPHQL_API_BASE_URL,
+                    json={"query": query, "variables": variables},
+                    headers=_get_auth_header(access_token),
+                )
+                return r
+                
+            except Exception as e:
+                import traceback
+                if hasattr(e, 'response') and e.response.status_code == 403:
+                    if 'Retry-After' in e.response.headers:
+                        retry_after = int(e.response.headers['Retry-After'])
+                        wait_time = retry_after * 1.5
+                        print(f"Rate limit hit. Waiting for {wait_time} seconds (1.5x the Retry-After value)")
+                        import time
+                        time.sleep(wait_time)
+                        continue
+                    print(f"403 Forbidden Error. Server response: {e.response.text}")
+                    print(f"header: {e.response.headers}")
+                else:
+                    print(f"Error: {str(e)}")
+                print("Stack trace:")
+                print(traceback.format_exc())
+                raise
 
+    
     data = _request().json()
     if "errors" in data:
         raise ValueError(data)

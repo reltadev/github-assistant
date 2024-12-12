@@ -6,7 +6,7 @@ from data_pipelines.github_pipeline import (
 )
 from datetime import datetime
 from enum import Enum
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, Column, DateTime
 from sqlalchemy_utils import create_database, database_exists
 from sqlalchemy import MetaData
 import os
@@ -22,7 +22,12 @@ class GithubRepoInfo(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     owner: str
     repo_name: str
-    last_pipeline_run: datetime | None = None
+    last_pipeline_run: datetime | None = Field(
+      sa_column=Column(
+          DateTime(timezone=True),
+          default=None
+      )
+    )
     pipeline_status: PipelineStatus | None = None 
     loaded_issues: bool = Field(default=True)
     loaded_pull_requests: bool = Field(default=True)
@@ -70,15 +75,6 @@ class GithubRepoInfo(SQLModel, table=True):
                 self.loaded_issues = True
             except Exception as e:
                 print(f"Failed to load issues data: {e}")
-                
-                
-        if load_pull_requests:
-            try:
-                load_pull_requests_data(self.owner, self.repo_name, destination_url, access_token=access_token)
-                self.loaded_pull_requests = True
-            except Exception as e:
-                print(f"Failed to load pull requests data: {e}")
-                
 
         if load_commits:
             try:
@@ -87,7 +83,19 @@ class GithubRepoInfo(SQLModel, table=True):
             except Exception as e:
                 print(f"Failed to load commit data: {e}")
                 
+                
+        if load_pull_requests:
+            try:
+                load_pull_requests_data(self.owner, self.repo_name, destination_url, access_token=access_token)
+                self.loaded_pull_requests = True
+            except Exception as e:
+                import traceback
+                print(f"Failed to load pull requests data: {e}")
+                print("Stack trace:")
+                print(traceback.format_exc())
+                
 
+    
         # If nothing was loaded successfully, raise an exception
         if not any([self.loaded_stars, self.loaded_issues, 
                     self.loaded_pull_requests, self.loaded_commits]):
@@ -98,4 +106,4 @@ class GithubRepoInfo(SQLModel, table=True):
 
     def source_name(self) -> str:
         """lowercase and remove special characters"""
-        return f"{self.owner.lower()}_{self.repo_name.lower().replace('-', '')}"
+        return f"{self.owner.lower().replace('-', '')}_{self.repo_name.lower().replace('-', '')}"
