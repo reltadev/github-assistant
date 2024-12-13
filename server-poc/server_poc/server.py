@@ -12,6 +12,7 @@ import os.path
 from typing import Optional
 from datetime import datetime, timedelta
 import traceback
+from typing import TypedDict
 
     
 load_dotenv()
@@ -27,6 +28,10 @@ class Prompt(BaseModel):
 class Feedback(BaseModel):
     type: str
     message: dict
+
+class FeedbackResponse(TypedDict):
+    status: str
+    pr_url: str
 
 
 # Move global variables into a class for better organization
@@ -268,7 +273,7 @@ def add_prompt_to_chat(prompt: Prompt, owner:str, repo_name: str, background_tas
 def record_feedback(feedback: Feedback):
     if feedback.type == "positive":
         print("ignoring positive feedback")
-        return {"status": "SUCCESS"}
+        return FeedbackResponse(status="SUCCESS", pr_url=None)
 
     print(feedback.message)
     match_resp = None
@@ -282,8 +287,11 @@ def record_feedback(feedback: Feedback):
         print("Couldn't find matching Response for feedback")
 
     layer = server_state.source.semantic_layer
-    layer.refine(pr=True)
-    return {"status": "SUCCESS"}
+    pr_url = layer.refine(pr=True)
+    
+    if not pr_url:
+        return FeedbackResponse(status="FAILURE", pr_url=None)
+    return FeedbackResponse(status="SUCCESS", pr_url=pr_url)
 
 @app.get("/")
 async def root():
