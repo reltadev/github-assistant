@@ -55,10 +55,11 @@ export const POST = async (request: Request) => {
             query: z.string().describe("The query to provide the agent."),
           }),
           execute: async (requestData) => {
-            const rows = await relta.getDataQuery(requestData.query);
+            const { id, rows } = await relta.getDataQuery(requestData.query);
             const config = await generateChartConfig(rows);
             return {
               ...config,
+              id,
               rows,
               hint:
                 rows.length > 0
@@ -74,8 +75,8 @@ export const POST = async (request: Request) => {
             query: z.string().describe("The query to provide the agent."),
           }),
           execute: async (requestData) => {
-            const text = await relta.getTextQuery(requestData.query);
-            return text;
+            const { text, id } = await relta.getTextQuery(requestData.query);
+            return { text, id };
           },
         },
       },

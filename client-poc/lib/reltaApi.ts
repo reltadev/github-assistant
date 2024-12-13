@@ -72,25 +72,32 @@ export class ReltaApiClient {
     return response.json();
   }
 
-  async getDataQuery(prompt: string): Promise<object[]> {
-    const { sql_result } = (await this.fetchJson("data", {
+  async getDataQuery(prompt: string): Promise<{ rows: object[]; id: string }> {
+    const { sql_result, chat } = (await this.fetchJson("data", {
       method: "POST",
       body: { prompt },
-    })) as { sql_result: object[] };
+    })) as { sql_result: object[]; chat: { id: string } };
 
-    return sql_result ?? [];
+    return { rows: sql_result ?? [], id: chat.id };
   }
 
-  async getTextQuery(prompt: string): Promise<string> {
+  async getTextQuery(prompt: string): Promise<{ text: string; id: string }> {
     const result = (await this.fetchJson("prompt", {
       method: "POST",
       body: { prompt },
-    })) as { text?: string; detail?: string };
+    })) as { text?: string; detail?: string; chat: { id: string } };
 
-    return result.text ?? result.detail ?? JSON.stringify(result);
+    return {
+      text: result.text ?? result.detail ?? JSON.stringify(result),
+      id: result.chat.id,
+    };
   }
 
-  async submitFeedback(type: string, message: object): Promise<void> {
+  async submitFeedback(
+    chatId: string,
+    type: string,
+    message: object
+  ): Promise<void> {
     await this.fetchJson("feedback", {
       method: "POST",
       body: { type, message },
