@@ -3,7 +3,7 @@
 github-assistant is a PoC built using [Relta](http://relta.dev) and [assistant-ui](assistant-ui.com). Read more about the project [here](http://medium.com).
 
 
-The Relta sub-module is currently not open source, though is available upon request for both commercial and non-commercial uses at amir at relta.dev.
+The Relta sub-module is currently not open source, though is available upon request for both commercial and non-commercial uses at amir [at] relta.dev.
 
 ## Requirements
 
