@@ -2,6 +2,8 @@
 
 github-assistant is a PoC built using [Relta](http://relta.dev) and [assistant-ui](assistant-ui.com). You can try it out [here](https://github-assistant.com) and read more about the project in this [blog](https://medium.com/relta/github-assistant-49ae388ad758).
 
+
+
 ![Architecture](./architecture.png)
 
 
