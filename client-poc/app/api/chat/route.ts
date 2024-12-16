@@ -62,6 +62,7 @@ export const POST = async (request: Request) => {
           ...c,
           result: {
             ...result,
+            rowCount: result.rows.length,
             rows:
               result.rows.length <= 6
                 ? result.rows
