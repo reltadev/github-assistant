@@ -3,6 +3,7 @@ import { getEdgeRuntimeResponse } from "@assistant-ui/react/edge";
 import { generateObject } from "ai";
 import { z } from "zod";
 import { ReltaApiClient } from "../../../lib/reltaApi";
+import { CoreMessage } from "@assistant-ui/react";
 
 export const maxDuration = 30;
 
@@ -33,10 +34,43 @@ You can use natural language queries to answer questions the user has about the 
 If a question is best answered by displaying a graph/chart, use the "chart" tool.
 If a question is about a single data point (e.g. "who made the most recent commit?"), use the "text" tool.
 
+If using the "chart" tool, specify the x-Axis type and unit on the chart (e.g. "stars per day").
+
 When printing a chart, ONLY call the provided function call. This will print the chart to the user. Do not use images.`;
 
 export const POST = async (request: Request) => {
-  const { owner, repo, ...requestData } = await request.json();
+  const {
+    owner,
+    repo,
+    messages: clientMessages,
+    ...requestData
+  } = (await request.json()) as {
+    owner: string;
+    repo: string;
+    messages: CoreMessage[];
+  };
+
+  const messages = clientMessages.map((m) => {
+    if (m.role !== "assistant") return m;
+    return {
+      ...m,
+      content: m.content.map((c) => {
+        if (c.type !== "tool-call" || c.toolName !== "chart") return c;
+
+        const result = c.result as { rows: object[] };
+        return {
+          ...c,
+          result: {
+            ...result,
+            rows:
+              result.rows.length <= 6
+                ? result.rows
+                : [...result.rows.slice(0, 3), ...result.rows.slice(-3)],
+          },
+        };
+      }),
+    };
+  });
 
   const relta = new ReltaApiClient({
     owner,
@@ -63,7 +97,7 @@ export const POST = async (request: Request) => {
               rows,
               hint:
                 rows.length > 0
-                  ? "The chart is being displayed the user."
+                  ? "The chart is being displayed the user. As an LLM, you only see the first 3 rows and the last 3 rows."
                   : "No data available.",
             };
           },
@@ -81,7 +115,10 @@ export const POST = async (request: Request) => {
         },
       },
     },
-    requestData,
+    requestData: {
+      messages,
+      ...requestData,
+    },
     abortSignal: request.signal,
   });
 };
