@@ -6,6 +6,7 @@ export const defaultRepos = [
   { owner: "langchain-ai", repo: "langchain" },
   { owner: "openai", repo: "whisper" },
   { owner: "dlt-hub", repo: "dlt" },
+  { owner: "AgentOps-AI", repo: "agentops" },
   // { owner: "joaomdmoura", repo: "crewai" },
   // { owner: "jerryjliu", repo: "llama_index" },
   // { owner: "huggingface", repo: "transformers" },

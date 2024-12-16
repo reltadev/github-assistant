@@ -71,7 +71,9 @@ export default function RepoSelection() {
   return (
     <div className="min-h-dvh flex flex-col">
       <div className="border-b px-4 container mx-auto py-6 flex gap-2 items-center">
-        <h1 className="text-2xl font-bold">github assistant</h1>
+        <h1 className="text-2xl font-bold">github-assistant</h1>
+        by <a href="https://www.assistant-ui.com/">assistant-ui</a> and
+        <a href="https://relta.dev">relta</a>
         <div className="flex-1" />
         <SignedIn>
           <SignOutButton />
@@ -79,18 +81,28 @@ export default function RepoSelection() {
       </div>
       <div className="container mx-auto px-4 py-8 flex flex-col justify-center">
         <div>
-          <h1 className="text-3xl font-bold text-center mb-8">
+          <h1 className="text-3xl font-bold text-center mt-16 mb-8">
             Which repository do you want to explore?
           </h1>
+          <p className="mb-16 text-center">
+            GitHub assistant is a tool for exploring GitHub repositories by
+            asking natural language questions.{" "}
+            <a
+              className="underline"
+              href="https://medium.com/relta/github-assistant-49ae388ad758"
+            >
+              Learn more
+            </a>
+          </p>
 
-          {/* Original 10 repos */}
+          {/* default repos */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-8">
             {renderRepoCards(defaultRepos)}
           </div>
 
           <hr className="my-8 border-gray-200" />
 
-          {/* User added repos */}
+          {/* user added repos */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-8">
             {renderRepoCards(userRepos, deleteRepository)}
 
