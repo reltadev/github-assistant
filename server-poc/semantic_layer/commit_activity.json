@@ -18,6 +18,20 @@
       "dtype": "VARCHAR"
     },
     {
+      "name": "message_headline",
+      "description": "The title of the git commit.",
+      "categories": null,
+      "skip_categorical_load": false,
+      "dtype": "VARCHAR"
+    },
+    {
+      "name": "message",
+      "description": "The body of the git commit.",
+      "categories": null,
+      "skip_categorical_load": false,
+      "dtype": "VARCHAR"
+    },
+    {
       "name": "additions",
       "description": "The number of lines added in the commit.",
       "categories": null,
@@ -57,5 +71,5 @@
     "Which commit had the most lines of code changed?",
     "give me information about the last xxx commits"
   ],
-  "sql_to_underlying_datasource": "SELECT committed_date, author__user__login, additions, deletions, changed_files FROM commits.commits"
+  "sql_to_underlying_datasource": "SELECT committed_date, author__user__login, additions, message_headline, message, deletions, changed_files FROM commits.commits"
 }

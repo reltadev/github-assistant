@@ -5,7 +5,7 @@
   "dimensions": [
     {
       "name": "starred_at",
-      "description": "The timestamp when the repository was starred. If the questions is for a value over time without specifying time granularity, return daily values",
+      "description": "The timestamp when the repository was starred. If the questions is for a value over time without specifying time granularity, return daily data",
       "categories": null,
       "skip_categorical_load": false,
       "dtype": "TIMESTAMP WITH TIME ZONE"
