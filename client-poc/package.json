@@ -28,6 +28,7 @@
     "langsmith": "^0.2.13",
     "lucide-react": "^0.468.0",
     "next": "15.1.0",
+    "posthog-js": "^1.201.0",
     "react": "^19",
     "react-dom": "^19",
     "react-hook-form": "^7.54.0",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEdgeRuntime } from "@assistant-ui/react";
+import { Composer, useEdgeRuntime } from "@assistant-ui/react";
 import { Thread } from "@assistant-ui/react";
 import { makeMarkdownText } from "@assistant-ui/react-markdown";
 import { ChartToolUI } from "./tools/ChartToolUI";
@@ -11,6 +11,24 @@ const MarkdownText = makeMarkdownText();
 type MyAssistantProps = {
   owner: string;
   repo: string;
+};
+
+const MyComposer = () => {
+  return (
+    <>
+      <Composer />
+      <p className="self-end pt-1.5">
+        powered by{" "}
+        <a className="underline" href="https://github.com/github/Assistant-UI">
+          assistant-ui
+        </a>{" "}
+        and{" "}
+        <a className="underline" href="https://relta.dev">
+          Relta
+        </a>
+      </p>
+    </>
+  );
 };
 
 export function MyAssistant({ owner, repo }: MyAssistantProps) {
@@ -58,6 +76,7 @@ export function MyAssistant({ owner, repo }: MyAssistantProps) {
           },
         ],
       }}
+      components={{ Composer: MyComposer }}
     />
   );
 }
