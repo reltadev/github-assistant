@@ -1,9 +1,8 @@
 import { openai } from "@ai-sdk/openai";
-import { getEdgeRuntimeResponse } from "@assistant-ui/react/edge";
-import { generateObject } from "ai";
+import { generateObject, streamText, CoreMessage } from "ai";
 import { z } from "zod";
 import { ReltaApiClient } from "../../../lib/reltaApi";
-import { CoreMessage } from "@assistant-ui/react";
+import { AISDKExporter } from "langsmith/vercel";
 
 export const maxDuration = 30;
 
@@ -22,6 +21,7 @@ const generateChartConfig = async (rows: object[]) => {
       type: z.enum(["bar", "line", "pie"]),
       title: z.string(),
     }),
+    experimental_telemetry: AISDKExporter.getSettings(),
   });
   return object;
 };
@@ -46,7 +46,6 @@ export const POST = async (request: Request) => {
     owner,
     repo,
     messages: clientMessages,
-    ...requestData
   } = (await request.json()) as {
     owner: string;
     repo: string;
@@ -54,25 +53,28 @@ export const POST = async (request: Request) => {
   };
 
   const messages = clientMessages.map((m) => {
-    if (m.role !== "assistant") return m;
+    if (m.role !== "tool") return m;
     return {
       ...m,
-      content: m.content.map((c) => {
-        if (c.type !== "tool-call" || c.toolName !== "chart") return c;
+      content:
+        typeof m.content === "string"
+          ? m.content
+          : m.content.map((c) => {
+              if (c.toolName !== "chart") return c;
 
-        const result = c.result as { rows: object[] };
-        return {
-          ...c,
-          result: {
-            ...result,
-            rowCount: result.rows.length,
-            rows:
-              result.rows.length <= 6
-                ? result.rows
-                : [...result.rows.slice(0, 3), ...result.rows.slice(-3)],
-          },
-        };
-      }),
+              const result = c.result as { rows: object[] };
+              return {
+                ...c,
+                result: {
+                  ...result,
+                  rowCount: result.rows.length,
+                  rows:
+                    result.rows.length <= 6
+                      ? result.rows
+                      : [...result.rows.slice(0, 3), ...result.rows.slice(-3)],
+                },
+              };
+            }),
     };
   });
 
@@ -81,48 +83,45 @@ export const POST = async (request: Request) => {
     repo_name: repo,
   });
 
-  return getEdgeRuntimeResponse({
-    options: {
-      model,
-      system: getRouterSystemPrompt(`${owner}/${repo}`),
-      tools: {
-        chart: {
-          description:
-            "Query the GitHub metadata with the provided natural language query, and return the data as a table, which will be automatically displayed to the user in the form of a chart or table.",
-          parameters: z.object({
-            query: z.string().describe("The query to provide the agent."),
-          }),
-          execute: async (requestData) => {
-            const { id, rows } = await relta.getDataQuery(requestData.query);
-            const config = await generateChartConfig(rows);
-            return {
-              ...config,
-              id,
-              rows,
-              hint:
-                rows.length > 0
-                  ? "The chart is being displayed the user. As an LLM, you only see the first 3 rows and the last 3 rows."
-                  : "No data available.",
-            };
-          },
+  const stream = streamText({
+    model,
+    messages,
+    system: getRouterSystemPrompt(`${owner}/${repo}`),
+    tools: {
+      chart: {
+        description:
+          "Query the GitHub metadata with the provided natural language query, and return the data as a table, which will be automatically displayed to the user in the form of a chart or table.",
+        parameters: z.object({
+          query: z.string().describe("The query to provide the agent."),
+        }),
+        execute: async (requestData) => {
+          const { id, rows } = await relta.getDataQuery(requestData.query);
+          const config = await generateChartConfig(rows);
+          return {
+            ...config,
+            id,
+            rows,
+            hint:
+              rows.length > 0
+                ? "The chart is being displayed the user. As an LLM, you only see the first 3 rows and the last 3 rows."
+                : "No data available.",
+          };
         },
-        text: {
-          description:
-            "Query GitHub metadata with the provided natural language query, and return a natural language answer.",
-          parameters: z.object({
-            query: z.string().describe("The query to provide the agent."),
-          }),
-          execute: async (requestData) => {
-            const { text, id } = await relta.getTextQuery(requestData.query);
-            return { text, id };
-          },
+      },
+      text: {
+        description:
+          "Query GitHub metadata with the provided natural language query, and return a natural language answer.",
+        parameters: z.object({
+          query: z.string().describe("The query to provide the agent."),
+        }),
+        execute: async (requestData) => {
+          const { text, id } = await relta.getTextQuery(requestData.query);
+          return { text, id };
         },
       },
     },
-    requestData: {
-      messages,
-      ...requestData,
-    },
-    abortSignal: request.signal,
+    experimental_telemetry: AISDKExporter.getSettings(),
   });
+
+  return stream.toDataStreamResponse();
 };
