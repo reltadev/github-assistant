@@ -14,7 +14,10 @@ const generateChartConfig = async (rows: object[]) => {
     model,
     system:
       "You are a helpful assistant that answers questions about a GitHub repository. Identify the correct chart type based on the provided data.",
-    prompt: JSON.stringify({ rows }),
+    prompt: JSON.stringify({
+      rowCount: rows.length,
+      rows: rows.length <= 6 ? rows : [...rows.slice(0, 3), ...rows.slice(-3)],
+    }),
     schema: z.object({
       type: z.enum(["bar", "line", "pie"]),
       title: z.string(),
