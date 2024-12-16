@@ -42,6 +42,7 @@ export function MyAssistant({ owner, repo }: MyAssistantProps) {
         },
       },
     },
+    unstable_AISDKInterop: true,
   });
 
   return (
