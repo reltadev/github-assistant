@@ -30,9 +30,6 @@ if (typeof window !== "undefined") {
     person_profiles: "identified_only", // or 'always' to create profiles for anonymous users as well
   });
 }
-export function CSPostHogProvider({ children }) {
-  return { children };
-}
 
 export default function Providers({ children }: PropsWithChildren) {
   const queryClient = getQueryClient();
