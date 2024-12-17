@@ -60,6 +60,7 @@ export function MyAssistant({ owner, repo }: MyAssistantProps) {
         },
       },
     },
+    maxSteps: 4,
     unstable_AISDKInterop: true,
   });
 
