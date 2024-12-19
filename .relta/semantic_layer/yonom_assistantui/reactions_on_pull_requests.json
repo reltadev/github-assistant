@@ -1,0 +1,32 @@
+{
+  "name": "reactions_on_pull_requests",
+  "description": "Tracks the number of reactions on pull requests, including specific pull request numbers like PR 67.",
+  "datasource": "pull_requests",
+  "dimensions": [
+    {
+      "name": "pr_number",
+      "description": "The unique number identifying a pull request.",
+      "categories": null,
+      "dtype": "bigint"
+    },
+    {
+      "name": "reaction_content",
+      "description": "The type of reaction given to a pull request, such as thumbs up, thumbs down, etc.",
+      "categories": null,
+      "dtype": "varchar"
+    }
+  ],
+  "measures": [
+    {
+      "name": "total_reactions",
+      "description": "The total count of reactions on a pull request.",
+      "expr": "COUNT(pull_requests.pull_requests__reactions._dlt_id)"
+    }
+  ],
+  "sample_questions": [
+    "How many reactions did PR 67 get?",
+    "What are the total reactions on pull requests?",
+    "Can you list the types of reactions on pull requests?"
+  ],
+  "sql_to_underlying_datasource": "SELECT pull_requests.number AS pr_number, pull_requests__reactions.content AS reaction_content, COUNT(pull_requests__reactions._dlt_id) AS total_reactions FROM pull_requests.pull_requests LEFT JOIN pull_requests.pull_requests__reactions ON pull_requests._dlt_id = pull_requests__reactions._dlt_parent_id GROUP BY pull_requests.number, pull_requests__reactions.content"
+}
