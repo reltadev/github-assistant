@@ -1,0 +1,24 @@
+{
+  "name": "open_pull_requests",
+  "description": "Provides information about the number of open pull requests in the repository.",
+  "datasource": "pull_requests",
+  "dimensions": [
+    {
+      "name": "state",
+      "description": "The state of the pull request, e.g., open or closed.",
+      "categories": null,
+      "dtype": "string"
+    }
+  ],
+  "measures": [
+    {
+      "name": "open_pr_count",
+      "description": "The total number of open pull requests.",
+      "expr": "COUNT(pull_requests.pull_requests.number)"
+    }
+  ],
+  "sample_questions": [
+    "How many open PRs are on the repo?"
+  ],
+  "sql_to_underlying_datasource": "SELECT COUNT(pull_requests.pull_requests.number) AS open_pr_count FROM pull_requests.pull_requests WHERE state = 'open'"
+}

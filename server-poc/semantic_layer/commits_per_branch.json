@@ -1,0 +1,25 @@
+{
+  "name": "commits_per_branch",
+  "description": "Tracks the number of commits per branch in the repository.",
+  "datasource": "commits",
+  "dimensions": [
+    {
+      "name": "branch_name",
+      "description": "The name of the branch in the repository.",
+      "categories": null,
+      "dtype": "string"
+    }
+  ],
+  "measures": [
+    {
+      "name": "commit_count",
+      "description": "The total number of commits in a branch.",
+      "expr": "COUNT(commits.commits.oid)"
+    }
+  ],
+  "sample_questions": [
+    "How many commits are there per branch?",
+    "List the branches with the most commits."
+  ],
+  "sql_to_underlying_datasource": "SELECT branch_name, COUNT(commits.commits.oid) AS commit_count FROM commits.commits GROUP BY branch_name"
+}
