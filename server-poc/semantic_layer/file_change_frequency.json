@@ -1,0 +1,24 @@
+{
+  "name": "file_change_frequency",
+  "description": "This metric tracks the frequency of changes made to files in commits, identifying which files are changed most often.",
+  "datasource": "commits.commits",
+  "dimensions": [
+    {
+      "name": "changed_files",
+      "description": "The number of files changed in a commit.",
+      "categories": null,
+      "dtype": "BIGINT"
+    }
+  ],
+  "measures": [
+    {
+      "name": "change_frequency",
+      "description": "The number of times a file change count occurs in commits.",
+      "expr": "COUNT(*)"
+    }
+  ],
+  "sample_questions": [
+    "Which file had the most changes and how often was it changed?"
+  ],
+  "sql_to_underlying_datasource": "SELECT changed_files, COUNT(*) as change_frequency FROM commits.commits GROUP BY changed_files ORDER BY change_frequency DESC LIMIT 100;"
+}
