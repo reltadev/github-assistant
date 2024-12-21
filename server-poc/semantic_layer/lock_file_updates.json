@@ -1,0 +1,25 @@
+{
+  "name": "lock_file_updates",
+  "description": "Tracks the number of times the lock file was updated within a specified time period.",
+  "datasource": "commits.commits",
+  "dimensions": [
+    {
+      "name": "committed_date",
+      "description": "The date and time when the commit was made.",
+      "categories": null,
+      "dtype": "TIMESTAMP WITH TIME ZONE"
+    }
+  ],
+  "measures": [
+    {
+      "name": "lock_file_update_count",
+      "description": "Counts the number of updates made to the lock file.",
+      "expr": "COUNT(*)"
+    }
+  ],
+  "sample_questions": [
+    "How many times was the lock file updated last month?",
+    "What is the total number of lock file updates this year?"
+  ],
+  "sql_to_underlying_datasource": "SELECT COUNT(*) FROM commits.commits WHERE message_headline LIKE '%lock file%' AND committed_date >= $start_date AND committed_date <= $end_date"
+}
