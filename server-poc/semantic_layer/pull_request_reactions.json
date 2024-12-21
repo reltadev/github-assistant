@@ -1,0 +1,37 @@
+{
+  "name": "pull_request_reactions",
+  "description": "Tracks the number of reactions on pull requests, allowing users to query reactions for specific pull requests.",
+  "datasource": "pull_requests",
+  "dimensions": [
+    {
+      "name": "number",
+      "description": "The unique number identifying the pull request.",
+      "categories": null,
+      "dtype": "BIGINT"
+    },
+    {
+      "name": "author__login",
+      "description": "The login of the user who authored the pull request.",
+      "categories": null,
+      "dtype": "VARCHAR"
+    },
+    {
+      "name": "created_at",
+      "description": "The timestamp when the pull request was created.",
+      "categories": null,
+      "dtype": "TIMESTAMP WITH TIME ZONE"
+    }
+  ],
+  "measures": [
+    {
+      "name": "reaction_count",
+      "description": "The total number of reactions on a pull request.",
+      "expr": "(SELECT COUNT(*) FROM issues.issues__reactions WHERE _dlt_parent_id = pull_requests.number)"
+    }
+  ],
+  "sample_questions": [
+    "How many reactions did PR 67 get?",
+    "What is the total number of reactions on pull request number 123?"
+  ],
+  "sql_to_underlying_datasource": "SELECT pull_requests.number, pull_requests.author__login, pull_requests.created_at, (SELECT COUNT(*) FROM issues.issues__reactions WHERE _dlt_parent_id = pull_requests.number) as reaction_count FROM pull_requests"
+}
