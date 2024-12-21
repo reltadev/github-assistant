@@ -95,12 +95,13 @@ export const POST = async (request: Request) => {
           query: z.string().describe("The query to provide the agent."),
         }),
         execute: async (requestData) => {
-          const { id, rows } = await relta.getDataQuery(requestData.query);
+          const { id, rows, sql } = await relta.getDataQuery(requestData.query);
           const config = await generateChartConfig(rows);
           return {
             ...config,
             id,
             rows,
+            sql,
             hint:
               rows.length > 0
                 ? "The chart is being displayed the user. As an LLM, you only see the first 3 rows and the last 3 rows."

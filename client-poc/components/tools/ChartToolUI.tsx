@@ -22,6 +22,9 @@ import {
 } from "@/components/ui/chart";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { MousePointerClickIcon } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import React from "react";
+import GitHubDataFlow from "../flow/GitHubDataFlow";
 
 const getColumns = (data: object[]) => {
   const [xAxis, ...yAxis] = data.reduce<string[]>((acc, row) => {
@@ -44,6 +47,7 @@ const getColumns = (data: object[]) => {
 
 type ChartConfig = {
   rows: object[];
+  sql: string;
   type: "area" | "bar" | "line";
   title: string;
 };
@@ -160,6 +164,16 @@ const MyChart: FC<{ config: ChartConfig }> = ({ config }) => {
   );
 };
 
+function extractTableNameFromQuery(sql: string): string | null {
+  // This regex looks for the word "FROM" (case-insensitive),
+  // then captures one or more non-whitespace characters (the table name).
+  // The 'i' flag makes it case-insensitive.
+  const fromRegex = /\bfrom\s+([^\s]+)\b/i;
+
+  const match = sql.match(fromRegex);
+  return match ? match[1] : null;
+}
+
 export const ChartToolUI = makeAssistantToolUI<
   Record<string, never>,
   ChartConfig
@@ -183,12 +197,31 @@ export const ChartToolUI = makeAssistantToolUI<
       );
 
     return (
-      <Card>
-        <CardHeader className="py-4 text-center">{result.title}</CardHeader>
-        <CardContent className="pb-4">
-          <MyChart config={result} />
-        </CardContent>
-      </Card>
+      <Tabs defaultValue="account" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="chart">Chart</TabsTrigger>
+          <TabsTrigger value="sql">Generated SQL</TabsTrigger>
+          <TabsTrigger value="semantic-layer">Data Flow</TabsTrigger>
+        </TabsList>
+        <TabsContent value="chart">
+          <Card>
+            <CardHeader className="py-4 text-center">{result.title}</CardHeader>
+            <CardContent className="pb-4">
+              <MyChart config={result} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="sql">
+          <pre className="whitespace-pre-wrap border rounded-lg p-4 bg-muted/50">
+            <code>{result.sql}</code>
+          </pre>
+        </TabsContent>
+        <TabsContent value="semantic-layer">
+          <GitHubDataFlow
+            table={extractTableNameFromQuery(result.sql) ?? "Relta"}
+          />
+        </TabsContent>
+      </Tabs>
     );
   },
 });

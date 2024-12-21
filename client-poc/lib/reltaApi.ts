@@ -72,23 +72,35 @@ export class ReltaApiClient {
     return response.json();
   }
 
-  async getDataQuery(prompt: string): Promise<{ rows: object[]; id: string }> {
-    const { sql_result, chat } = (await this.fetchJson("data", {
+  async getDataQuery(
+    prompt: string
+  ): Promise<{ rows: object[]; id: string; sql: string }> {
+    const { sql, sql_result, chat } = (await this.fetchJson("data", {
       method: "POST",
       body: { prompt },
-    })) as { sql_result: object[]; chat: { id: string } };
+    })) as { sql_result: object[]; sql: string; chat: { id: string } };
 
-    return { rows: sql_result ?? [], id: chat.id };
+    return { rows: sql_result ?? [], sql, id: chat.id };
   }
 
-  async getTextQuery(prompt: string): Promise<{ text: string; id: string }> {
+  async getTextQuery(
+    prompt: string
+  ): Promise<{ text: string; sql_result: object[]; sql: string; id: string }> {
     const result = (await this.fetchJson("prompt", {
       method: "POST",
       body: { prompt },
-    })) as { text?: string; detail?: string; chat: { id: string } };
+    })) as {
+      text?: string;
+      detail?: string;
+      chat: { id: string };
+      sql_result: object[];
+      sql: string;
+    };
 
     return {
       text: result.text ?? result.detail ?? JSON.stringify(result),
+      sql: result.sql,
+      sql_result: result.sql_result,
       id: result.chat.id,
     };
   }
@@ -97,11 +109,13 @@ export class ReltaApiClient {
     chatId: string,
     type: string,
     message: object
-  ): Promise<void> {
-    await this.fetchJson("feedback", {
+  ): Promise<{ pr_url?: string }> {
+    const result = (await this.fetchJson("feedback", {
       method: "POST",
+      query: { chat_id: chatId },
       body: { type, message },
-    });
+    })) as { pr_url?: string };
+    return result;
   }
 
   async getRepoInfo(): Promise<RepoInfo> {
