@@ -1,0 +1,37 @@
+{
+  "name": "new_dependency_commit",
+  "description": "Identifies commits that introduced a new dependency on a third-party library by analyzing commit messages or changes in dependency files like package.json.",
+  "datasource": "commits",
+  "dimensions": [
+    {
+      "name": "oid",
+      "description": "The unique identifier for the commit.",
+      "categories": null,
+      "dtype": "string"
+    },
+    {
+      "name": "message_headline",
+      "description": "The headline of the commit message.",
+      "categories": null,
+      "dtype": "string"
+    },
+    {
+      "name": "committed_date",
+      "description": "The date and time when the commit was made.",
+      "categories": null,
+      "dtype": "timestamp"
+    }
+  ],
+  "measures": [
+    {
+      "name": "new_dependency_count",
+      "description": "Counts the number of new dependencies introduced in a commit.",
+      "expr": "COUNT(DISTINCT oid)"
+    }
+  ],
+  "sample_questions": [
+    "Which commit introduced a new dependency on a third-party library?",
+    "How many new dependencies were added in a specific commit?"
+  ],
+  "sql_to_underlying_datasource": "SELECT oid, message_headline, committed_date FROM commits.commits WHERE message_headline LIKE '%add dependency%' OR message LIKE '%add dependency%' OR message LIKE '%package.json%' OR message LIKE '%dependency management%' "
+}
