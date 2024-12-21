@@ -7,7 +7,7 @@ export const POST = async (request: Request) => {
     owner,
     repo_name: repo,
   });
-
-  await relta.submitFeedback(chatId, type, message);
-  return new Response("Feedback submitted", { status: 200 });
+  console.log(chatId, type, message);
+  const result = await relta.submitFeedback(chatId, type, message);
+  return Response.json(result, { status: 200 });
 };

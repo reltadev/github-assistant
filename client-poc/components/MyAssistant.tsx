@@ -5,6 +5,8 @@ import { Thread } from "@assistant-ui/react";
 import { makeMarkdownText } from "@assistant-ui/react-markdown";
 import { ChartToolUI } from "./tools/ChartToolUI";
 import { TextToolUI } from "./tools/TextToolUI";
+import { create } from "zustand";
+import { GitPullRequest, LoaderCircleIcon, LoaderIcon } from "lucide-react";
 
 const MarkdownText = makeMarkdownText();
 
@@ -13,9 +15,39 @@ type MyAssistantProps = {
   repo: string;
 };
 
+const useFeedbackState = create<{ isLoading?: boolean; prUrl?: string }>(
+  () => ({})
+);
+
 const MyComposer = () => {
+  const { isLoading, prUrl } = useFeedbackState((state) => state);
   return (
     <>
+      {!!isLoading && (
+        <div className="flex  gap-2 border rounded-lg w-full mb-3 px-4 py-3">
+          <LoaderCircleIcon className="animate-spin" />{" "}
+          <div>
+            <p className="font-semibold">
+              Creating a PR based on your feedback
+            </p>
+            <p>Loading...</p>
+          </div>
+        </div>
+      )}
+      {!!prUrl && (
+        <div className="flex  gap-2 border rounded-lg w-full mb-3 px-4 py-3">
+          <GitPullRequest />{" "}
+          <div>
+            <p className="font-semibold">
+              PR #{prUrl.split("/").at(-1)} created based on your feedback
+            </p>
+            <a className="underline" href={prUrl}>
+              {prUrl}
+            </a>
+          </div>
+        </div>
+      )}
+
       <Composer />
       <p className="self-end pt-1.5">
         powered by{" "}
@@ -46,17 +78,22 @@ export function MyAssistant({ owner, repo }: MyAssistantProps) {
                   : undefined
               )
               .filter(Boolean)[0] ?? "-";
-          console.log({ chatId, type, message });
-          await fetch(`/feedback`, {
+
+          if (type === "negative") {
+            useFeedbackState.setState({ isLoading: true });
+          }
+          const { pr_url } = await fetch(`/api/feedback`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ owner, repo, chatId, type, message }),
           })
             .then((response) => response.json())
-            .then((data) => console.log("Feedback submitted:", data))
             .catch((error) =>
               console.error("Error submitting feedback:", error)
-            );
+            )
+            .finally(() => useFeedbackState.setState({ isLoading: false }));
+
+          useFeedbackState.setState({ prUrl: pr_url }, true);
         },
       },
     },
